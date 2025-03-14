@@ -1,0 +1,17 @@
+{
+  "name": "fastify-mysql",
+  "version": "1.0.0",
+  "description": "for testing node.js fastify mysql performance",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Sascha Angermann",
+  "license": "ISC",
+  "dependencies": {
+    "fastify": "5.2.1",
+    "fastify-mysql": "file:",
+    "mysql2": "3.13.0"
+  }
+}

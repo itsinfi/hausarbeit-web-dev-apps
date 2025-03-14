@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS example_table (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    param1 VARCHAR(1024) NOT NULL,
+    param2 INT NOT NULL,
+    param3 DATE NOT NULL
+);

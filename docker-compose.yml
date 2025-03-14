@@ -1,0 +1,81 @@
+services:
+  express-mysql:
+    build:
+      context: ./node-js-perf-tests/express-mysql
+    container_name: express_mysql
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
+
+  express-mongodb:
+    build:
+      context: ./node-js-perf-tests/express-mongodb
+    container_name: express_mongodb
+    environment:
+      DB_HOST: mongodb
+      DB_NAME: testdb
+    ports:
+      - "3001:3000"
+    depends_on:
+      - mongodb
+
+  fastify-mysql:
+    build:
+      context: ./node-js-perf-tests/fastify-mysql
+    container_name: fastify_mysql
+    ports:
+      - "3002:3000"
+    depends_on:
+      - mysql
+
+  fastify-mongodb:
+    build:
+      context: ./node-js-perf-tests/fastify-mongodb
+    container_name: fastify_mongodb
+    ports:
+      - "3003:3000"
+    depends_on:
+      - mongodb
+
+  jaxrs-mysql:
+    build:
+      context: ./jakarta-ee-perf-tests/jaxrs-mysql
+    container_name: jaxrs_mysql
+    ports: 
+      - "3004:8080"
+    depends_on:
+      - mysql
+
+  jaxrs-mongodb:
+    build:
+      context: ./jakarta-ee-perf-tests/jaxrs-mongodb
+    container_name: jaxrs_mongodb
+    ports: 
+      - "3005:8080"
+    depends_on:
+      - mongodb
+
+  mysql:
+    image: mysql:9.2.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: testdb
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
+
+  mongodb:
+    image: mongo:8.0.5-noble
+    container_name: mongodb
+    volumes:
+      - mongodb-data:/data/db
+    ports:
+      - "27017:27017"
+
+volumes:
+  mysql-data:
+  mongodb-data:
