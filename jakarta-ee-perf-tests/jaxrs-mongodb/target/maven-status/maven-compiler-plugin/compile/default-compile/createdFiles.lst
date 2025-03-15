@@ -1,0 +1,3 @@
+org/study/iu/mongodb/jaxrs/db/DataSourceProvider.class
+org/study/iu/mongodb/jaxrs/api/RestApplication.class
+org/study/iu/mongodb/jaxrs/api/rest/RestResource.class
