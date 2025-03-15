@@ -3,10 +3,10 @@ services:
     build:
       context: ./node-js/express
     container_name: express
-    # env_file:
-    #   - .env
-    # environment:
-    #   - DB_HOST=${DB_HOST}
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=${DB_HOST}
     ports:
       - "3000:3000"
 
@@ -14,10 +14,10 @@ services:
     build:
       context: ./node-js/fastify
     container_name: fastify
-    # env_file:
-    #   - .env
-    # environment:
-    #   - DB_HOST=${DB_HOST}
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=${DB_HOST}
     ports:
       - "3001:3000"
 
@@ -25,33 +25,9 @@ services:
     build: 
       context: ./jakarta-ee/jaxrs
     container_name: jaxrs
-    # env_file:
-    #   - .env
-    # environment:
-    #   - APP_HOST=${APP_HOST}
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=${DB_HOST}
     ports: 
       - "3002:9080"
-
-  # mysql:
-  #   image: mysql:9.2.0
-  #   container_name: mysql
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: root
-  #     MYSQL_DATABASE: testdb
-  #   volumes:
-  #     - mysql-data:/var/lib/mysql
-  #     - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
-  #   ports:
-  #     - "3306:3306"
-
-  # mongodb:
-  #   image: mongo:8.0.5-noble
-  #   container_name: mongodb
-  #   volumes:
-  #     - mongodb-data:/data/db
-  #   ports:
-  #     - "27017:27017"
-
-# volumes:
-#   mysql-data:
-#   mongodb-data:
