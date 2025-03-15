@@ -31,3 +31,14 @@ services:
       - DB_HOST=${DB_HOST}
     ports: 
       - "3002:9080"
+
+  httpservlet:
+    build: 
+      context: ./jakarta-ee/httpservlet
+    container_name: httpservlet
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=${DB_HOST}
+    ports: 
+      - "3003:9080"
