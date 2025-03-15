@@ -1,4 +1,4 @@
-package org.study.iu.mysql.jaxrs.api;
+package org.study.iu.mongodb.jaxrs.api;
 
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.ApplicationPath;

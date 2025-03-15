@@ -10,7 +10,7 @@ public class DataSourceProvider {
 
     static {
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:mysql://host.docker.internal:3306/testdb?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true");
+        config.setJdbcUrl("jdbc:mysql://" + System.getenv("DB_HOST") + ":3306/testdb?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true");
         config.setUsername("root");
         config.setPassword("root");
         config.setMaximumPoolSize(10);

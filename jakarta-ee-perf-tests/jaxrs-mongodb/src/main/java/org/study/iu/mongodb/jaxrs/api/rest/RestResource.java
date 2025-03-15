@@ -1,9 +1,8 @@
-package org.study.iu.mysql.jaxrs.api.rest;
+package org.study.iu.mongodb.jaxrs.api.rest;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.InsertManyOptions;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -12,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.study.iu.mysql.jaxrs.db.DataSourceProvider;
+import org.study.iu.mongodb.jaxrs.db.DataSourceProvider;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
