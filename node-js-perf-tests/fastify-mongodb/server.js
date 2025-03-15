@@ -1,7 +1,10 @@
+require('dotenv').config({ path: '../../.env' });
 const fastify = require('fastify')();
 const { MongoClient } = require('mongodb');
 
-const uri = 'mongodb://host.docker.internal:27017/';
+const dbHost = process.env.DB_HOST || 'localhost';
+
+const uri = `mongodb://${dbHost}:27017/`;
 const dbName = 'testdb';
 
 const client = new MongoClient(uri);

@@ -1,5 +1,8 @@
+require('dotenv').config({ path: '../../.env' });
 const express = require('express');
 const mysql = require('mysql2');
+
+const dbHost = process.env.DB_HOST || 'localhost';
 
 const app = express();
 const router = express.Router();
@@ -7,7 +10,7 @@ const router = express.Router();
 app.use(express.json());
 
 const pool = mysql.createPool({
-    host: 'host.docker.internal',
+    host: dbHost,
     user: 'root',
     password: 'root',
     database: 'testdb',

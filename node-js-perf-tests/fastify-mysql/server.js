@@ -1,8 +1,11 @@
+require('dotenv').config({ path: '../../.env' });
 const fastify = require('fastify')();
 const mysql = require('mysql2');
 
+const dbHost = process.env.DB_HOST || 'localhost';
+
 const pool = mysql.createPool({
-    host: 'host.docker.internal',
+    host: dbHost,
     user: 'root',
     password: 'root',
     database: 'testdb',

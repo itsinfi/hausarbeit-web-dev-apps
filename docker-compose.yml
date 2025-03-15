@@ -3,6 +3,10 @@ services:
     build:
       context: ./node-js-perf-tests/express-mysql
     container_name: express_mysql
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=${DB_HOST}
     ports:
       - "3000:3000"
     depends_on:
@@ -12,9 +16,10 @@ services:
     build:
       context: ./node-js-perf-tests/express-mongodb
     container_name: express_mongodb
+    env_file:
+      - .env
     environment:
-      DB_HOST: mongodb
-      DB_NAME: testdb
+      - DB_HOST=${DB_HOST}
     ports:
       - "3001:3000"
     depends_on:
@@ -24,6 +29,10 @@ services:
     build:
       context: ./node-js-perf-tests/fastify-mysql
     container_name: fastify_mysql
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=${DB_HOST}
     ports:
       - "3002:3000"
     depends_on:
@@ -33,6 +42,10 @@ services:
     build:
       context: ./node-js-perf-tests/fastify-mongodb
     container_name: fastify_mongodb
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=${DB_HOST}
     ports:
       - "3003:3000"
     depends_on:
@@ -42,6 +55,10 @@ services:
     build:
       context: ./jakarta-ee-perf-tests/jaxrs-mysql
     container_name: jaxrs_mysql
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=${DB_HOST}
     ports: 
       - "3004:8080"
     depends_on:
@@ -51,6 +68,10 @@ services:
     build:
       context: ./jakarta-ee-perf-tests/jaxrs-mongodb
     container_name: jaxrs_mongodb
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=${DB_HOST}
     ports: 
       - "3005:8080"
     depends_on:

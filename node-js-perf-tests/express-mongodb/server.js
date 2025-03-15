@@ -1,12 +1,15 @@
+require('dotenv').config({ path: '../../.env' });
 const express = require('express');
 const { MongoClient } = require('mongodb');
+
+const dbHost = process.env.DB_HOST || 'localhost';
 
 const app = express();
 const router = express.Router();
 
 app.use(express.json());
 
-const uri = 'mongodb://host.docker.internal:27017/';
+const uri = `mongodb://${dbHost}:27017/`;
 const dbName = 'testdb';
 
 const client = new MongoClient(uri);
