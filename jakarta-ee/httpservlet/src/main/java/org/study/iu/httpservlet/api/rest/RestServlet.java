@@ -43,10 +43,22 @@ public class RestServlet extends HttpServlet {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
         
-        JsonObject entity = Json.createObjectBuilder()
+        AsyncContext asyncContext = req.startAsync();
+        asyncContext.start(() -> {
+            try {
+                JsonObject entity = Json.createObjectBuilder()
                 .add("msg", "Hello World!")
                 .build();
-        
-        
+
+                try (PrintWriter out = resp.getWriter()) {
+                    out.print(entity.toString());
+                    out.flush();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                asyncContext.complete();
+            }
+        });
     }   
 }
