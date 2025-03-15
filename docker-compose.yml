@@ -1,102 +1,57 @@
 services:
-  express-mysql:
+  express:
     build:
-      context: ./node-js/express-mysql
-    container_name: express_mysql
-    env_file:
-      - .env
-    environment:
-      - DB_HOST=${DB_HOST}
+      context: ./node-js/express
+    container_name: express
+    # env_file:
+    #   - .env
+    # environment:
+    #   - DB_HOST=${DB_HOST}
     ports:
       - "3000:3000"
-    depends_on:
-      - mysql
 
-  express-mongodb:
+  fastify:
     build:
-      context: ./node-js/express-mongodb
-    container_name: express_mongodb
-    env_file:
-      - .env
-    environment:
-      - DB_HOST=${DB_HOST}
+      context: ./node-js/fastify
+    container_name: fastify
+    # env_file:
+    #   - .env
+    # environment:
+    #   - DB_HOST=${DB_HOST}
     ports:
       - "3001:3000"
-    depends_on:
-      - mongodb
 
-  fastify-mysql:
-    build:
-      context: ./node-js/fastify-mysql
-    container_name: fastify_mysql
-    env_file:
-      - .env
-    environment:
-      - DB_HOST=${DB_HOST}
-    ports:
-      - "3002:3000"
-    depends_on:
-      - mysql
-
-  fastify-mongodb:
-    build:
-      context: ./node-js/fastify-mongodb
-    container_name: fastify_mongodb
-    env_file:
-      - .env
-    environment:
-      - DB_HOST=${DB_HOST}
-    ports:
-      - "3003:3000"
-    depends_on:
-      - mongodb
-
-  jaxrs-mysql:
-    build:
-      context: ./jakarta-ee/jaxrs-mysql
-    container_name: jaxrs_mysql
-    env_file:
-      - .env
-    environment:
-      - DB_HOST=${DB_HOST}
+  jaxrs:
+    build: 
+      context: ./jakarta-ee/jaxrs
+    container_name: jaxrs
+    # env_file:
+    #   - .env
+    # environment:
+    #   - APP_HOST=${APP_HOST}
     ports: 
-      - "3004:8080"
-    depends_on:
-      - mysql
+      - "3002:9080"
 
-  jaxrs-mongodb:
-    build:
-      context: ./jakarta-ee/jaxrs-mongodb
-    container_name: jaxrs_mongodb
-    env_file:
-      - .env
-    environment:
-      - DB_HOST=${DB_HOST}
-    ports: 
-      - "3005:8080"
-    depends_on:
-      - mongodb
+  # mysql:
+  #   image: mysql:9.2.0
+  #   container_name: mysql
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: root
+  #     MYSQL_DATABASE: testdb
+  #   volumes:
+  #     - mysql-data:/var/lib/mysql
+  #     - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+  #   ports:
+  #     - "3306:3306"
 
-  mysql:
-    image: mysql:9.2.0
-    container_name: mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: testdb
-    volumes:
-      - mysql-data:/var/lib/mysql
-      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
-    ports:
-      - "3306:3306"
+  # mongodb:
+  #   image: mongo:8.0.5-noble
+  #   container_name: mongodb
+  #   volumes:
+  #     - mongodb-data:/data/db
+  #   ports:
+  #     - "27017:27017"
 
-  mongodb:
-    image: mongo:8.0.5-noble
-    container_name: mongodb
-    volumes:
-      - mongodb-data:/data/db
-    ports:
-      - "27017:27017"
-
-volumes:
-  mysql-data:
-  mongodb-data:
+# volumes:
+#   mysql-data:
+#   mongodb-data:
