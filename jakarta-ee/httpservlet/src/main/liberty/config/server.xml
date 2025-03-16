@@ -1,12 +1,22 @@
 <server description="defaultServer">
+    <jvmOptions>
+        <option>-Xms512m</option>
+        <option>-Xmx3g</option>
+    </jvmOptions>
+    
     <featureManager>
+        <feature>jakartaee-11.0</feature>
         <feature>servlet-6.1</feature>
         <feature>jsonb-3.0</feature>
     </featureManager>
+
     <basicRegistry id="defaultBasicRegistry" realm="BasicRealm">
         <user name="username" password="password" />
     </basicRegistry>
+
     <keyStore id="defaultKeyStore" password="password" />
+
     <httpEndpoint id="defaultHttpEndpoint" host="*" httpPort="9080" httpsPort="9443" />
+
     <webApplication location="app.war" contextRoot="/"/>
 </server>
