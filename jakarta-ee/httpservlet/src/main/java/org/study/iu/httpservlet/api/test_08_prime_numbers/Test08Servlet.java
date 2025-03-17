@@ -53,6 +53,7 @@ public class Test08Servlet extends TestServlet {
     @Override
     protected JsonObject executeTest(JsonObject jsonInput) throws IOException {
         final int amount = jsonInput.getInt("amount", DEFAULT_AMOUNT);
+        
         ArrayList<Integer> primes = new ArrayList<Integer>();
         int limit = amount;
         int iterations = 0;

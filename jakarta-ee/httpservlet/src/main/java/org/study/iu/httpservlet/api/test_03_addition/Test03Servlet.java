@@ -56,10 +56,11 @@ public class Test03Servlet extends TestServlet {
         final int iterations = jsonInput.getInt("iterations", DEFAULT_ITERATIONS);
         final int lowerBound = jsonInput.getInt("lowerBound", DEFAULT_LOWER_BOUND);
         final int upperBound = jsonInput.getInt("upperBound", DEFAULT_UPPER_BOUND);
+        
         double sum = 0.0;
 
         for (int i = 0; i < iterations; i++) {
-            final double randomRealNumber = RANDOM.nextDouble(0, 1);
+            final double randomRealNumber = RANDOM.nextDouble(lowerBound, upperBound);
             sum += randomRealNumber;
         }
 

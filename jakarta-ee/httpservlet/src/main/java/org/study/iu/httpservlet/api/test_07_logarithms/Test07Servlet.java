@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Random;
 
 import org.study.iu.httpservlet.classes.TestServlet;
@@ -20,7 +21,6 @@ import org.study.iu.httpservlet.classes.TestServlet;
 public class Test07Servlet extends TestServlet {
     
     private static final int DEFAULT_ITERATIONS = 1000;
-    private static final int DEFAULT_RANGE = 1000;
     
     private static final Random RANDOM = new Random();
 
@@ -53,12 +53,16 @@ public class Test07Servlet extends TestServlet {
     @Override
     protected JsonObject executeTest(JsonObject jsonInput) {
         final int iterations = jsonInput.getInt("iterations", DEFAULT_ITERATIONS);
-        final int range = jsonInput.getInt("range", DEFAULT_RANGE);
+        
         int finiteCount = 0;
 
         for (int i = 0; i < iterations; i++) {
-            final double randomRealNumber = 0.01 + RANDOM.nextDouble() * range;
+            final double randomRealNumber = RANDOM.nextDouble() < 0.5
+                    ? RANDOM.nextDouble() * 1.0e-100
+                    : RANDOM.nextDouble() * 1.0e100;
+
             final double result = Math.log(randomRealNumber);
+
             if (Double.isFinite(result)) {
                 finiteCount++;
             }
@@ -66,7 +70,6 @@ public class Test07Servlet extends TestServlet {
 
         return Json.createObjectBuilder()
                 .add("iterations", iterations)
-                .add("range", range)
                 .add("result", finiteCount)
                 .build();
     }

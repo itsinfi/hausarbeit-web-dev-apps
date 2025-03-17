@@ -50,7 +50,7 @@ public class Test09Servlet extends TestServlet {
         });
     }
 
-    private void flattenJson(JsonValue json, ArrayList<Integer> numbers) {
+    private void flattenJson(JsonValue json, ArrayList<Double> numbers) {
         switch (json.getValueType()) {
             case OBJECT:
                 final JsonObject jsonObject = json.asJsonObject();
@@ -67,7 +67,7 @@ public class Test09Servlet extends TestServlet {
                 break;
 
             case NUMBER:
-                numbers.add(((JsonNumber) json).intValue());
+                numbers.add(((JsonNumber) json).doubleValue());
                 break;
 
             default:
@@ -77,13 +77,13 @@ public class Test09Servlet extends TestServlet {
     
     @Override
     protected JsonObject executeTest(JsonObject jsonInput) {
-        final ArrayList<Integer> numbers = new ArrayList<Integer>();
+        final ArrayList<Double> numbers = new ArrayList<Double>();
 
         this.flattenJson(jsonInput, numbers);
 
         final JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
 
-        for (Integer number : numbers) {
+        for (Double number : numbers) {
             jsonArrayBuilder.add(number);
         }
 

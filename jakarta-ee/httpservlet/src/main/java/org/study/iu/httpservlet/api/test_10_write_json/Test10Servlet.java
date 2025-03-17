@@ -60,14 +60,14 @@ public class Test10Servlet extends TestServlet {
     private JsonObject generateJsonObject(int depth, int objectsPerLevel, int arraySize, int minValue, int maxValue) {
         final JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
 
-        jsonObjectBuilder.add("_", generateJsonArray(arraySize, minValue, maxValue));
-
         if (depth > 1) {
             for (int i = 1; i <= objectsPerLevel; i++) {
                 jsonObjectBuilder.add(Integer.toString(i),
-                        this.generateJsonObject(depth - 1, objectsPerLevel, arraySize, minValue, maxValue));
+                this.generateJsonObject(depth - 1, objectsPerLevel, arraySize, minValue, maxValue));
             }
         }
+        
+        jsonObjectBuilder.add("_", generateJsonArray(arraySize, minValue, maxValue));
 
         return jsonObjectBuilder.build();
     }
@@ -76,7 +76,7 @@ public class Test10Servlet extends TestServlet {
         final JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
 
         for (int i = 0; i < size; i++) {
-            jsonArrayBuilder.add(RANDOM.nextInt(minValue, maxValue + 1));
+            jsonArrayBuilder.add(RANDOM.nextDouble(minValue, maxValue));
         }
 
         return jsonArrayBuilder.build();

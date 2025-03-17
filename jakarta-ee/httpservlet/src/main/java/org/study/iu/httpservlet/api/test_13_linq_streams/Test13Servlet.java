@@ -7,6 +7,7 @@ import jakarta.json.JsonNumber;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
 import jakarta.json.JsonValue;
+import jakarta.json.JsonValue.ValueType;
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -51,7 +52,7 @@ public class Test13Servlet extends TestServlet {
         });
     }
     
-    private void flattenJson(JsonValue json, ArrayList<Integer> numbers) {
+    private void flattenJson(JsonValue json, ArrayList<Double> numbers) {
         switch (json.getValueType()) {
             case OBJECT:
                 final JsonObject jsonObject = json.asJsonObject();
@@ -62,13 +63,12 @@ public class Test13Servlet extends TestServlet {
 
             case ARRAY:
                 final JsonArray jsonArray = json.asJsonArray();
+                double sum = 0.0;
                 for (JsonValue element : jsonArray) {
-                    this.flattenJson(element, numbers);
+                    sum += ((JsonNumber) element).doubleValue();
                 }
-                break;
-
-            case NUMBER:
-                numbers.add(((JsonNumber) json).intValue());
+                double avg = sum / jsonArray.size();
+                numbers.add(avg);
                 break;
 
             default:
@@ -78,7 +78,7 @@ public class Test13Servlet extends TestServlet {
     
     @Override
     protected JsonObject executeTest(JsonObject jsonInput) {
-        final ArrayList<Integer> numbers = new ArrayList<Integer>();
+        final ArrayList<Double> numbers = new ArrayList<Double>();
 
         this.flattenJson(jsonInput, numbers);
 
@@ -86,7 +86,7 @@ public class Test13Servlet extends TestServlet {
 
         final JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
 
-        for (Integer number : numbers) {
+        for (Double number : numbers) {
             jsonArrayBuilder.add(number);
         }
 
