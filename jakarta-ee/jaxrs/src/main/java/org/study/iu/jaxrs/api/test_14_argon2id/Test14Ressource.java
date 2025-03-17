@@ -1,17 +1,6 @@
 package org.study.iu.jaxrs.api.test_14_argon2id;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonReader;
-import jakarta.servlet.AsyncContext;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -19,10 +8,21 @@ import java.util.Arrays;
 import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
 import org.bouncycastle.crypto.params.Argon2Parameters;
 import org.bouncycastle.util.encoders.Hex;
-import org.study.iu.jaxrs.classes.TestServlet;
+import org.study.iu.jaxrs.classes.TestRessource;
 
-@WebServlet(value = "/api/14", asyncSupported = true)
-public class Test14Servlet extends TestServlet {
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.container.AsyncResponse;
+import jakarta.ws.rs.container.Suspended;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
+@Path("14")
+public class Test14Ressource extends TestRessource {
 
     private static final int DEFAULT_ARGON2_ITERATIONS = 3;
     private static final int DEFAULT_ARGON2_PARALLELISM = 4;
@@ -31,32 +31,23 @@ public class Test14Servlet extends TestServlet {
 
     private static final SecureRandom RANDOM = new SecureRandom();
 
+    @POST
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
+    public void post(@Suspended AsyncResponse res, JsonObject req) throws IOException {
+        if (req.containsKey("password")) {
+            final JsonObject entity = executeTest(req);
 
-        final AsyncContext asyncContext = req.startAsync();
-        asyncContext.start(() -> {
-            try (
-                    final InputStream inputStream = req.getInputStream();
-                    final JsonReader jsonReader = Json.createReader(new InputStreamReader(inputStream, "UTF-8"))) {
-                final JsonObject jsonInput = jsonReader.readObject();
+            Response response = Response
+                    .ok()
+                    .entity(entity)
+                    .build();
 
-                if (jsonInput.containsKey("password")) {
-                    final JsonObject jsonOutput = executeTest(jsonInput);
-
-                    try (final PrintWriter out = resp.getWriter()) {
-                        out.print(jsonOutput.toString());
-                        out.flush();
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                asyncContext.complete();
-            }
-        });
+            res.resume(response);
+        } else {
+            res.resume(Response.noContent().build());
+        }
     }
     
     private String hashPassword(String password, int iterations, int parallelism, int memoryInKb, int saltSize) {

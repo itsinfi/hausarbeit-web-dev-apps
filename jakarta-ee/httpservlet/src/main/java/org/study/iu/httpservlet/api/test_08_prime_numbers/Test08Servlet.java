@@ -1,5 +1,14 @@
 package org.study.iu.httpservlet.api.test_08_prime_numbers;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import org.study.iu.httpservlet.classes.TestServlet;
+
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
@@ -10,14 +19,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import org.study.iu.httpservlet.classes.TestServlet;
 
 @WebServlet(value = "/api/08", asyncSupported = true)
 public class Test08Servlet extends TestServlet {
@@ -54,7 +55,7 @@ public class Test08Servlet extends TestServlet {
     protected JsonObject executeTest(JsonObject jsonInput) throws IOException {
         final int amount = jsonInput.getInt("amount", DEFAULT_AMOUNT);
         
-        ArrayList<Integer> primes = new ArrayList<Integer>();
+        ArrayList<Integer> primes = new ArrayList<>();
         int limit = amount;
         int iterations = 0;
 

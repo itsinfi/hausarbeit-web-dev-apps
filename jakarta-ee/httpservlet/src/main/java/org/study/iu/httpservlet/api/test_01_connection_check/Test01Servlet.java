@@ -1,5 +1,12 @@
 package org.study.iu.httpservlet.api.test_01_connection_check;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+
+import org.study.iu.httpservlet.classes.TestServlet;
+
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
@@ -8,12 +15,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-
-import org.study.iu.httpservlet.classes.TestServlet;
 
 @WebServlet(value = "/api/01", asyncSupported = true)
 public class Test01Servlet extends TestServlet {
@@ -30,7 +31,7 @@ public class Test01Servlet extends TestServlet {
                     final JsonReader jsonReader = Json.createReader(new InputStreamReader(inputStream, "UTF-8"))) {
                 final JsonObject jsonInput = jsonReader.readObject();
 
-                if ((jsonInput).containsKey("name")) {
+                if (jsonInput.containsKey("name")) {
                     final JsonObject jsonOutput = executeTest(jsonInput);
 
                     try (final PrintWriter out = resp.getWriter()) {

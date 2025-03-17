@@ -1,60 +1,49 @@
 package org.study.iu.jaxrs.api.test_08_prime_numbers;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import org.study.iu.jaxrs.classes.TestRessource;
+
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonReader;
-import jakarta.servlet.AsyncContext;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.container.AsyncResponse;
+import jakarta.ws.rs.container.Suspended;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
-import org.study.iu.jaxrs.classes.TestServlet;
-
-@WebServlet(value = "/api/08", asyncSupported = true)
-public class Test08Servlet extends TestServlet {
+@Path("08")
+public class Test08Ressource extends TestRessource {
 
     private static final int DEFAULT_AMOUNT = 1000;
 
+    @POST
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
+    public void post(@Suspended AsyncResponse res, JsonObject req) throws IOException {
+        final JsonObject entity = executeTest(req);
 
-        final AsyncContext asyncContext = req.startAsync();
-        asyncContext.start(() -> {
-            try (
-                    final InputStream inputStream = req.getInputStream();
-                    final JsonReader jsonReader = Json.createReader(new InputStreamReader(inputStream, "UTF-8"))) {
-                final JsonObject jsonInput = jsonReader.readObject();
+        Response response = Response
+                .ok()
+                .entity(entity)
+                .build();
 
-                final JsonObject jsonOutput = executeTest(jsonInput);
-
-                try (final PrintWriter out = resp.getWriter()) {
-                    out.print(jsonOutput.toString());
-                    out.flush();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                asyncContext.complete();
-            }
-        });
+        res.resume(response);
     }
     
     @Override
     protected JsonObject executeTest(JsonObject jsonInput) throws IOException {
         final int amount = jsonInput.getInt("amount", DEFAULT_AMOUNT);
         
-        ArrayList<Integer> primes = new ArrayList<Integer>();
+        ArrayList<Integer> primes = new ArrayList<>();
         int limit = amount;
         int iterations = 0;
 

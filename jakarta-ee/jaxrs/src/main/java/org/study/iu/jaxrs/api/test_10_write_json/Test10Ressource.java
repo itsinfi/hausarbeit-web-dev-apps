@@ -1,26 +1,26 @@
 package org.study.iu.jaxrs.api.test_10_write_json;
 
+import java.io.IOException;
+import java.util.Random;
+
+import org.study.iu.jaxrs.classes.TestRessource;
+
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
-import jakarta.json.JsonReader;
-import jakarta.servlet.AsyncContext;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.Random;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.container.AsyncResponse;
+import jakarta.ws.rs.container.Suspended;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
-import org.study.iu.jaxrs.classes.TestServlet;
-
-@WebServlet(value = "/api/10", asyncSupported = true)
-public class Test10Servlet extends TestServlet {
+@Path("10")
+public class Test10Ressource extends TestRessource {
 
     private static final int DEFAULT_DEPTH = 3;
     private static final int DEFAULT_OBJECTS_PER_LEVEL = 4;
@@ -30,31 +30,19 @@ public class Test10Servlet extends TestServlet {
     
     private static final Random RANDOM = new Random();
     
+    @POST
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
+    public void post(@Suspended AsyncResponse res, JsonObject req) throws IOException {
+        final JsonObject entity = executeTest(req);
 
-        final AsyncContext asyncContext = req.startAsync();
-        asyncContext.start(() -> {
-            try (
-                final InputStream inputStream = req.getInputStream();
-                final JsonReader jsonReader = Json.createReader(new InputStreamReader(inputStream, "UTF-8"))
-            ) {
-                final JsonObject jsonInput = jsonReader.readObject();
+        Response response = Response
+                .ok()
+                .entity(entity)
+                .build();
 
-                final JsonObject jsonOutput = executeTest(jsonInput);
-
-                try (final PrintWriter out = resp.getWriter()) {
-                    out.print(jsonOutput.toString());
-                    out.flush();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                asyncContext.complete();
-            }
-        });
+        res.resume(response);
     }
 
     private JsonObject generateJsonObject(int depth, int objectsPerLevel, int arraySize, int minValue, int maxValue) {

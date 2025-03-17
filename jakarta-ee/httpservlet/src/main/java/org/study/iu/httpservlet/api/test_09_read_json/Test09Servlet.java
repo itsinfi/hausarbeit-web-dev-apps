@@ -1,5 +1,13 @@
 package org.study.iu.httpservlet.api.test_09_read_json;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+
+import org.study.iu.httpservlet.classes.TestServlet;
+
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
@@ -12,13 +20,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-
-import org.study.iu.httpservlet.classes.TestServlet;
 
 @WebServlet(value = "/api/09", asyncSupported = true)
 public class Test09Servlet extends TestServlet {
@@ -52,32 +53,31 @@ public class Test09Servlet extends TestServlet {
 
     private void flattenJson(JsonValue json, ArrayList<Double> numbers) {
         switch (json.getValueType()) {
-            case OBJECT:
+            case OBJECT -> {
                 final JsonObject jsonObject = json.asJsonObject();
                 for (String key : jsonObject.keySet()) {
                     this.flattenJson(jsonObject.get(key), numbers);
                 }
-                break;
+            }
 
-            case ARRAY:
+            case ARRAY -> {
                 final JsonArray jsonArray = json.asJsonArray();
                 for (JsonValue element : jsonArray) {
                     this.flattenJson(element, numbers);
                 }
-                break;
+            }
 
-            case NUMBER:
+            case NUMBER -> {
                 numbers.add(((JsonNumber) json).doubleValue());
-                break;
+            }
 
-            default:
-                break;
+            default -> {}
         }
     }
     
     @Override
     protected JsonObject executeTest(JsonObject jsonInput) {
-        final ArrayList<Double> numbers = new ArrayList<Double>();
+        final ArrayList<Double> numbers = new ArrayList<>();
 
         this.flattenJson(jsonInput, numbers);
 
