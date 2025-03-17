@@ -2,7 +2,7 @@ package org.study.iu.jaxrs.api.test_01_connection_check;
 
 import java.io.IOException;
 
-import org.study.iu.jaxrs.classes.TestRessource;
+import org.study.iu.jaxrs.classes.AbstractAsyncTestController;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -16,7 +16,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("01")
-public class Test01Ressource extends TestRessource {
+public class Test01Controller extends AbstractAsyncTestController {
 
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })

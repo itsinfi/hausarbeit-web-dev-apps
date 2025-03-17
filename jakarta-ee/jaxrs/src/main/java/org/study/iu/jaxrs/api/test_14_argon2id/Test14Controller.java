@@ -1,14 +1,14 @@
 package org.study.iu.jaxrs.api.test_14_argon2id;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
 
 import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
 import org.bouncycastle.crypto.params.Argon2Parameters;
 import org.bouncycastle.util.encoders.Hex;
-import org.study.iu.jaxrs.classes.TestRessource;
+import org.study.iu.jaxrs.classes.AbstractAsyncTestController;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -16,13 +16,11 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.container.AsyncResponse;
-import jakarta.ws.rs.container.Suspended;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("14")
-public class Test14Ressource extends TestRessource {
+public class Test14Controller extends AbstractAsyncTestController {
 
     private static final int DEFAULT_ARGON2_ITERATIONS = 3;
     private static final int DEFAULT_ARGON2_PARALLELISM = 4;
@@ -34,20 +32,8 @@ public class Test14Ressource extends TestRessource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    @Override
-    public void post(@Suspended AsyncResponse res, JsonObject req) throws IOException {
-        if (req.containsKey("password")) {
-            final JsonObject entity = executeTest(req);
-
-            Response response = Response
-                    .ok()
-                    .entity(entity)
-                    .build();
-
-            res.resume(response);
-        } else {
-            res.resume(Response.noContent().build());
-        }
+    public CompletableFuture<Response> post(JsonObject req) {
+        return handlePost(req, this::executeTest);
     }
     
     private String hashPassword(String password, int iterations, int parallelism, int memoryInKb, int saltSize) {

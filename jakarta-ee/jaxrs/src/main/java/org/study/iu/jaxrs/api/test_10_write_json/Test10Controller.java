@@ -3,7 +3,7 @@ package org.study.iu.jaxrs.api.test_10_write_json;
 import java.io.IOException;
 import java.util.Random;
 
-import org.study.iu.jaxrs.classes.TestRessource;
+import org.study.iu.jaxrs.classes.AbstractAsyncTestController;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -20,7 +20,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("10")
-public class Test10Ressource extends TestRessource {
+public class Test10Controller extends AbstractAsyncTestController {
 
     private static final int DEFAULT_DEPTH = 3;
     private static final int DEFAULT_OBJECTS_PER_LEVEL = 4;

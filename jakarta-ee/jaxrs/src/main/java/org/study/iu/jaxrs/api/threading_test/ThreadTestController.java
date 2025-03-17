@@ -15,7 +15,7 @@ import jakarta.ws.rs.core.MediaType;
 
 @ApplicationScoped
 @Path("/test")
-public class ThreadTestRessource {
+public class ThreadTestController {
 
     @Resource
     private ManagedExecutorService managedExecutorService;

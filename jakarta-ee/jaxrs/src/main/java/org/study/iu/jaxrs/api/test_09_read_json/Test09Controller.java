@@ -1,11 +1,9 @@
-package org.study.iu.jaxrs.api.test_13_linq_streams;
+package org.study.iu.jaxrs.api.test_09_read_json;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
-import org.study.iu.jaxrs.classes.TestRessource;
+import org.study.iu.jaxrs.classes.AbstractAsyncTestController;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -22,8 +20,8 @@ import jakarta.ws.rs.container.Suspended;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@Path("13")
-public class Test13Ressource extends TestRessource {
+@Path("09")
+public class Test09Controller extends AbstractAsyncTestController {
 
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
@@ -39,7 +37,7 @@ public class Test13Ressource extends TestRessource {
 
         res.resume(response);
     }
-    
+
     private void flattenJson(JsonValue json, ArrayList<Double> numbers) {
         switch (json.getValueType()) {
             case OBJECT -> {
@@ -51,16 +49,14 @@ public class Test13Ressource extends TestRessource {
 
             case ARRAY -> {
                 final JsonArray jsonArray = json.asJsonArray();
-                double sum = 0.0;
                 for (JsonValue element : jsonArray) {
-                    sum += ((JsonNumber) element).doubleValue();
+                    this.flattenJson(element, numbers);
                 }
-                double avg = sum / jsonArray.size();
-                numbers.add(avg);
             }
 
-            default -> {
-            }
+            case NUMBER -> numbers.add(((JsonNumber) json).doubleValue());
+
+            default -> {}
         }
     }
     
@@ -69,8 +65,6 @@ public class Test13Ressource extends TestRessource {
         final ArrayList<Double> numbers = new ArrayList<>();
 
         this.flattenJson(jsonInput, numbers);
-
-        Collections.sort(numbers, Comparator.naturalOrder());
 
         final JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
 
@@ -81,7 +75,7 @@ public class Test13Ressource extends TestRessource {
         final JsonArray result = jsonArrayBuilder.build();
 
         return Json.createObjectBuilder()
-                .add("amount", numbers.size())
+                .add("found", result.size())
                 .add("result", result)
                 .build();
     }

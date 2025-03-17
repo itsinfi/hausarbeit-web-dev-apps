@@ -3,7 +3,7 @@ package org.study.iu.jaxrs.api.test_06_powers;
 import java.io.IOException;
 import java.util.Random;
 
-import org.study.iu.jaxrs.classes.TestRessource;
+import org.study.iu.jaxrs.classes.AbstractAsyncTestController;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -17,7 +17,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("06")
-public class Test06Ressource extends TestRessource {
+public class Test06Controller extends AbstractAsyncTestController {
     
     private static final int DEFAULT_ITERATIONS = 1000;
     private static final int DEFAULT_LOWER_BOUND = -10;

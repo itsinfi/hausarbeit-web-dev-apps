@@ -1,9 +1,9 @@
-package org.study.iu.jaxrs.api.test_07_logarithms;
+package org.study.iu.jaxrs.api.test_03_addition;
 
 import java.io.IOException;
 import java.util.Random;
 
-import org.study.iu.jaxrs.classes.TestRessource;
+import org.study.iu.jaxrs.classes.AbstractAsyncTestController;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -16,10 +16,12 @@ import jakarta.ws.rs.container.Suspended;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@Path("07")
-public class Test07Ressource extends TestRessource {
+@Path("03")
+public class Test03Controller extends AbstractAsyncTestController {
     
     private static final int DEFAULT_ITERATIONS = 1000;
+    private static final int DEFAULT_LOWER_BOUND = 0;
+    private static final int DEFAULT_UPPER_BOUND = 1;
     
     private static final Random RANDOM = new Random();
 
@@ -41,24 +43,21 @@ public class Test07Ressource extends TestRessource {
     @Override
     protected JsonObject executeTest(JsonObject jsonInput) {
         final int iterations = jsonInput.getInt("iterations", DEFAULT_ITERATIONS);
+        final int lowerBound = jsonInput.getInt("lowerBound", DEFAULT_LOWER_BOUND);
+        final int upperBound = jsonInput.getInt("upperBound", DEFAULT_UPPER_BOUND);
         
-        int finiteCount = 0;
+        double sum = 0.0;
 
         for (int i = 0; i < iterations; i++) {
-            final double randomRealNumber = RANDOM.nextDouble() < 0.5
-                    ? RANDOM.nextDouble() * 1.0e-100
-                    : RANDOM.nextDouble() * 1.0e100;
-
-            final double result = Math.log(randomRealNumber);
-
-            if (Double.isFinite(result)) {
-                finiteCount++;
-            }
+            final double randomRealNumber = RANDOM.nextDouble(lowerBound, upperBound);
+            sum += randomRealNumber;
         }
 
         return Json.createObjectBuilder()
                 .add("iterations", iterations)
-                .add("result", finiteCount)
+                .add("lowerBound", lowerBound)
+                .add("upperBound", upperBound)
+                .add("result", sum)
                 .build();
     }
 }

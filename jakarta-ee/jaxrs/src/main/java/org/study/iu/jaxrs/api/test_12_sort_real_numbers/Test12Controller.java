@@ -1,10 +1,10 @@
-package org.study.iu.jaxrs.api.test_11_sort_whole_numbers;
+package org.study.iu.jaxrs.api.test_12_sort_real_numbers;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Random;
 
-import org.study.iu.jaxrs.classes.TestRessource;
+import org.study.iu.jaxrs.classes.AbstractAsyncTestController;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -19,8 +19,8 @@ import jakarta.ws.rs.container.Suspended;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@Path("11")
-public class Test11Ressource extends TestRessource {
+@Path("12")
+public class Test12Controller extends AbstractAsyncTestController {
 
     private static final int DEFAULT_ARRAY_SIZE = 1000;
     private static final int DEFAULT_MIN_VALUE = 0;
@@ -49,10 +49,10 @@ public class Test11Ressource extends TestRessource {
         final int minValue = jsonInput.getInt("minValue", DEFAULT_MIN_VALUE);
         final int maxValue = jsonInput.getInt("maxValue", DEFAULT_MAX_VALUE);
 
-        final int[] array = new int[arraySize];
+        final double[] array = new double[arraySize];
 
         for (int i = 0; i < arraySize; i++) {
-            array[i] = RANDOM.nextInt(minValue, maxValue + 1);
+            array[i] = RANDOM.nextDouble(minValue, maxValue + 1);
         }
 
         Arrays.sort(array);

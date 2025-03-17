@@ -1,9 +1,9 @@
-package org.study.iu.jaxrs.api.test_02_static_content;
+package org.study.iu.jaxrs.api.test_07_logarithms;
 
 import java.io.IOException;
-import java.security.SecureRandom;
+import java.util.Random;
 
-import org.study.iu.jaxrs.classes.TestRessource;
+import org.study.iu.jaxrs.classes.AbstractAsyncTestController;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -16,13 +16,12 @@ import jakarta.ws.rs.container.Suspended;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@Path("02")
-public class Test02Ressource extends TestRessource {
-
-    private static final int DEFAULT_LENGTH = 1000;
+@Path("07")
+public class Test07Controller extends AbstractAsyncTestController {
     
-    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    private static final SecureRandom RANDOM = new SecureRandom();
+    private static final int DEFAULT_ITERATIONS = 1000;
+    
+    private static final Random RANDOM = new Random();
 
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
@@ -41,17 +40,25 @@ public class Test02Ressource extends TestRessource {
     
     @Override
     protected JsonObject executeTest(JsonObject jsonInput) {
-        final int length = jsonInput.getInt("length", DEFAULT_LENGTH);
+        final int iterations = jsonInput.getInt("iterations", DEFAULT_ITERATIONS);
+        
+        int finiteCount = 0;
 
-        final StringBuilder stringBuilder = new StringBuilder(length);
+        for (int i = 0; i < iterations; i++) {
+            final double randomRealNumber = RANDOM.nextDouble() < 0.5
+                    ? RANDOM.nextDouble() * 1.0e-100
+                    : RANDOM.nextDouble() * 1.0e100;
 
-        for (int i = 0; i < length; i++) {
-            stringBuilder.append(CHARACTERS.charAt(RANDOM.nextInt(CHARACTERS.length())));
+            final double result = Math.log(randomRealNumber);
+
+            if (Double.isFinite(result)) {
+                finiteCount++;
+            }
         }
 
         return Json.createObjectBuilder()
-                .add("length", length)
-                .add("result", stringBuilder.toString())
+                .add("iterations", iterations)
+                .add("result", finiteCount)
                 .build();
     }
 }

@@ -1,9 +1,9 @@
-package org.study.iu.jaxrs.api.test_05_division;
+package org.study.iu.jaxrs.api.test_04_multiplication;
 
 import java.io.IOException;
 import java.util.Random;
 
-import org.study.iu.jaxrs.classes.TestRessource;
+import org.study.iu.jaxrs.classes.AbstractAsyncTestController;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -16,8 +16,8 @@ import jakarta.ws.rs.container.Suspended;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@Path("05")
-public class Test05Ressource extends TestRessource {
+@Path("04")
+public class Test04Controller extends AbstractAsyncTestController {
     
     private static final int DEFAULT_ITERATIONS = 1000;
     private static final int DEFAULT_LOWER_BOUND = 1;
@@ -46,18 +46,18 @@ public class Test05Ressource extends TestRessource {
         final int lowerBound = jsonInput.getInt("lowerBound", DEFAULT_LOWER_BOUND);
         final int upperBound = jsonInput.getInt("upperBound", DEFAULT_UPPER_BOUND);
         
-        double quotient = Double.MAX_VALUE;
+        double product = 1.0;
 
         for (int i = 0; i < iterations; i++) {
             final double randomRealNumber = RANDOM.nextDouble(lowerBound, upperBound);
-            quotient /= randomRealNumber;
+            product *= randomRealNumber;
         }
 
         return Json.createObjectBuilder()
                 .add("iterations", iterations)
                 .add("lowerBound", lowerBound)
                 .add("upperBound", upperBound)
-                .add("result", quotient)
+                .add("result", product)
                 .build();
     }
 }
