@@ -33,7 +33,7 @@ public class Test14Controller extends AbstractAsyncTestController {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public CompletableFuture<Response> post(JsonObject req) {
-        return handlePost(req, this::executeTest);
+        return handlePost(req);
     }
     
     private String hashPassword(String password, int iterations, int parallelism, int memoryInKb, int saltSize) {

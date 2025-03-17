@@ -1,7 +1,7 @@
 package org.study.iu.jaxrs.api.test_10_write_json;
 
-import java.io.IOException;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 
 import org.study.iu.jaxrs.classes.AbstractAsyncTestController;
 
@@ -14,8 +14,6 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.container.AsyncResponse;
-import jakarta.ws.rs.container.Suspended;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -33,16 +31,8 @@ public class Test10Controller extends AbstractAsyncTestController {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    @Override
-    public void post(@Suspended AsyncResponse res, JsonObject req) throws IOException {
-        final JsonObject entity = executeTest(req);
-
-        Response response = Response
-                .ok()
-                .entity(entity)
-                .build();
-
-        res.resume(response);
+    public CompletableFuture<Response> post(JsonObject req) {
+        return handlePost(req);
     }
 
     private JsonObject generateJsonObject(int depth, int objectsPerLevel, int arraySize, int minValue, int maxValue) {

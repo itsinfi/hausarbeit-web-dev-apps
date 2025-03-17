@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 import org.study.iu.httpservlet.classes.TestServlet;
+import org.study.iu.httpservlet.classes.AbstractAsyncTestServlet;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -17,35 +18,35 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet(value = "/api/01", asyncSupported = true)
-public class Test01Servlet extends TestServlet {
+public class Test01Servlet extends AbstractAsyncTestServlet {
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
+    // @Override
+    // protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    //     resp.setContentType("application/json");
+    //     resp.setCharacterEncoding("UTF-8");
 
-        final AsyncContext asyncContext = req.startAsync();
-        asyncContext.start(() -> {
-            try (
-                    final InputStream inputStream = req.getInputStream();
-                    final JsonReader jsonReader = Json.createReader(new InputStreamReader(inputStream, "UTF-8"))) {
-                final JsonObject jsonInput = jsonReader.readObject();
+    //     final AsyncContext asyncContext = req.startAsync();
+    //     asyncContext.start(() -> {
+    //         try (
+    //                 final InputStream inputStream = req.getInputStream();
+    //                 final JsonReader jsonReader = Json.createReader(new InputStreamReader(inputStream, "UTF-8"))) {
+    //             final JsonObject jsonInput = jsonReader.readObject();
 
-                if (jsonInput.containsKey("name")) {
-                    final JsonObject jsonOutput = executeTest(jsonInput);
+    //             if (jsonInput.containsKey("name")) {
+    //                 final JsonObject jsonOutput = executeTest(jsonInput);
 
-                    try (final PrintWriter out = resp.getWriter()) {
-                        out.print(jsonOutput.toString());
-                        out.flush();
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                asyncContext.complete();
-            }
-        });
-    }
+    //                 try (final PrintWriter out = resp.getWriter()) {
+    //                     out.print(jsonOutput.toString());
+    //                     out.flush();
+    //                 }
+    //             }
+    //         } catch (IOException e) {
+    //             e.printStackTrace();
+    //         } finally {
+    //             asyncContext.complete();
+    //         }
+    //     });
+    // }
     
     @Override
     protected JsonObject executeTest(JsonObject jsonInput) {

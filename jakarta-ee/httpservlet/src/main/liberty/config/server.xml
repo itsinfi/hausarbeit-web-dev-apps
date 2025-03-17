@@ -1,10 +1,6 @@
 <server description="defaultServer">
-    <jvmOptions>
-        <option>-Xms512m</option>
-        <option>-Xmx3g</option>
-    </jvmOptions>
-    
     <featureManager>
+        <feature>concurrent-3.1</feature>
         <feature>jakartaee-11.0</feature>
         <feature>servlet-6.1</feature>
         <feature>jsonb-3.0</feature>
