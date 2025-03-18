@@ -1,17 +1,5 @@
 package org.study.iu.httpservlet.api.test_14_argon2id;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonReader;
-import jakarta.servlet.AsyncContext;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -19,10 +7,14 @@ import java.util.Arrays;
 import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
 import org.bouncycastle.crypto.params.Argon2Parameters;
 import org.bouncycastle.util.encoders.Hex;
-import org.study.iu.httpservlet.classes.TestServlet;
+import org.study.iu.httpservlet.classes.AbstractAsyncTestServlet;
+
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.servlet.annotation.WebServlet;
 
 @WebServlet(value = "/api/14", asyncSupported = true)
-public class Test14Servlet extends TestServlet {
+public class Test14Servlet extends AbstractAsyncTestServlet {
 
     private static final int DEFAULT_ARGON2_ITERATIONS = 3;
     private static final int DEFAULT_ARGON2_PARALLELISM = 4;
@@ -30,34 +22,6 @@ public class Test14Servlet extends TestServlet {
     private static final int DEFAULT_SALT_SIZE = 128;
 
     private static final SecureRandom RANDOM = new SecureRandom();
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
-
-        final AsyncContext asyncContext = req.startAsync();
-        asyncContext.start(() -> {
-            try (
-                    final InputStream inputStream = req.getInputStream();
-                    final JsonReader jsonReader = Json.createReader(new InputStreamReader(inputStream, "UTF-8"))) {
-                final JsonObject jsonInput = jsonReader.readObject();
-
-                if (jsonInput.containsKey("password")) {
-                    final JsonObject jsonOutput = executeTest(jsonInput);
-
-                    try (final PrintWriter out = resp.getWriter()) {
-                        out.print(jsonOutput.toString());
-                        out.flush();
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                asyncContext.complete();
-            }
-        });
-    }
     
     private String hashPassword(String password, int iterations, int parallelism, int memoryInKb, int saltSize) {
         byte[] salt = new byte[saltSize / 8];

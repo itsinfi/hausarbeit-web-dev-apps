@@ -28,13 +28,13 @@ public abstract class AbstractAsyncTestController {
         ExecutorService executor = null;
 
         switch (THREAD_MODE) {
-            case "VIRTUAL" -> {
+            case "V" -> {
                 executor = virtualThreadExecutor;
             }
-            case "MANAGED" -> {
+            case "M" -> {
                 executor = managedExecutor;
             }
-            case "THREAD_POOL" -> {
+            case "TP" -> {
                 executor = threadPoolExecutor;
             }
             default -> {

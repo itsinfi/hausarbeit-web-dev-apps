@@ -1,67 +1,28 @@
 package org.study.iu.httpservlet.api.test_08_prime_numbers;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.study.iu.httpservlet.classes.TestServlet;
+import org.study.iu.httpservlet.classes.AbstractAsyncTestServlet;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonReader;
-import jakarta.servlet.AsyncContext;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet(value = "/api/08", asyncSupported = true)
-public class Test08Servlet extends TestServlet {
+public class Test08Servlet extends AbstractAsyncTestServlet {
 
     private static final int DEFAULT_AMOUNT = 1000;
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
-
-        final AsyncContext asyncContext = req.startAsync();
-        asyncContext.start(() -> {
-            try (
-                    final InputStream inputStream = req.getInputStream();
-                    final JsonReader jsonReader = Json.createReader(new InputStreamReader(inputStream, "UTF-8"))) {
-                final JsonObject jsonInput = jsonReader.readObject();
-
-                final JsonObject jsonOutput = executeTest(jsonInput);
-
-                try (final PrintWriter out = resp.getWriter()) {
-                    out.print(jsonOutput.toString());
-                    out.flush();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                asyncContext.complete();
-            }
-        });
-    }
     
     @Override
-    protected JsonObject executeTest(JsonObject jsonInput) throws IOException {
+    protected JsonObject executeTest(JsonObject jsonInput) {
         final int amount = jsonInput.getInt("amount", DEFAULT_AMOUNT);
         
         ArrayList<Integer> primes = new ArrayList<>();
-        int limit = amount;
+        int limit = Math.max(2, amount);
         int iterations = 0;
-
-        if (amount <= 1) {
-            throw new IOException("'amount' needs to be > 1");
-        }
 
         do {
             final double squareRootOfLimit = Math.sqrt(limit);

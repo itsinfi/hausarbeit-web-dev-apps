@@ -17,7 +17,6 @@ import jakarta.servlet.AsyncContext;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.ws.rs.core.Response;
 
 public abstract class AbstractAsyncTestServlet extends HttpServlet {
     
@@ -32,10 +31,12 @@ public abstract class AbstractAsyncTestServlet extends HttpServlet {
     private static final ExecutorService threadPoolExecutor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
     private static final ExecutorService virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor();
 
-    private JsonObject handleRoute(HttpServletRequest req, HttpServletResponse res) {
+    private JsonObject handleRoute(HttpServletRequest req) {
+        ThreadMonitor.countThreads();
         try (
-                final InputStream inputStream = req.getInputStream();
-                final JsonReader jsonReader = Json.createReader(new InputStreamReader(inputStream, "UTF-8"))) {
+            final InputStream inputStream = req.getInputStream();
+            final JsonReader jsonReader = Json.createReader(new InputStreamReader(inputStream, "UTF-8"))
+        ) {
             final JsonObject jsonInput = jsonReader.readObject();
             return executeTest(jsonInput);
         } catch (IOException e) {
@@ -44,7 +45,8 @@ public abstract class AbstractAsyncTestServlet extends HttpServlet {
         return JsonObject.EMPTY_JSON_OBJECT;
     }
     
-    private void sendResponse(HttpServletResponse res, JsonObject jsonOutput, AsyncContext asyncContext) {
+    private Void sendResponse(HttpServletResponse res, JsonObject jsonOutput, AsyncContext asyncContext) {
+        ThreadMonitor.countThreads();
         try (final PrintWriter out = res.getWriter()) {
             out.print(jsonOutput.toString());
             out.flush();
@@ -53,9 +55,10 @@ public abstract class AbstractAsyncTestServlet extends HttpServlet {
         } finally {
             asyncContext.complete();
         }
+        return null;
     }
 
-    private void handleError(Throwable ex, AsyncContext asyncContext) {
+    private Void handleError(Throwable ex, AsyncContext asyncContext) {
         HttpServletResponse res = (HttpServletResponse) asyncContext.getResponse();
         
         JsonObject jsonError = Json.createObjectBuilder()
@@ -72,6 +75,7 @@ public abstract class AbstractAsyncTestServlet extends HttpServlet {
         } finally {
             asyncContext.complete();
         }
+        return null;
     }
     
     @Override
@@ -80,25 +84,39 @@ public abstract class AbstractAsyncTestServlet extends HttpServlet {
         res.setCharacterEncoding("UTF-8");
         
         AsyncContext asyncContext = req.startAsync();
+        // ThreadMonitor.printAllThreads();
 
         ExecutorService executor = null;
 
         switch (THREAD_MODE) {
-            case "VIRTUAL" -> { executor = virtualThreadExecutor; }
-            case "MANAGED" -> { executor = managedExecutor; }
-            case "THREAD_POOL" -> { executor = threadPoolExecutor; }
-            default -> {}
-        }
-        
-        if (executor == null) {
-            CompletableFuture.supplyAsync(() -> handleRoute(req, res))
-                    .thenApply(result -> sendResponse(res, result, asyncContext))
-                    .exceptionally(ex -> handleError(ex, asyncContext));
+            case "V" -> {
+                System.out.println("----------V----------");
+                executor = virtualThreadExecutor;
+            }
+            case "M" -> {
+                System.out.println("----------M----------");
+                executor = managedExecutor;
+            }
+            case "TP" -> {
+                System.out.println("----------TP----------");
+                executor = threadPoolExecutor;
+            }
+            default -> {
+                System.out.println("----------NONE----------");
+            }
         }
 
-        CompletableFuture.supplyAsync(() -> handleRoute(req, res), executor)
+        CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
                 .thenApply(result -> sendResponse(res, result, asyncContext))
                 .exceptionally(ex -> handleError(ex, asyncContext));
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
+        // ThreadMonitor.printAllThreads();
+        // ThreadMonitor.countThreads();
     }
 
 }
