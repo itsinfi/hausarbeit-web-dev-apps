@@ -42,7 +42,7 @@ public class Test13Servlet extends AbstractAsyncTestServlet {
     }
     
     @Override
-    protected JsonObject executeTest(JsonObject jsonInput) {
+    protected JsonObject test(JsonObject jsonInput) {
         final ArrayList<Double> numbers = new ArrayList<>();
 
         this.flattenJson(jsonInput, numbers);

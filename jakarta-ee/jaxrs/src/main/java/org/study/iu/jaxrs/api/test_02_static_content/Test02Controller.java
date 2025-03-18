@@ -17,10 +17,10 @@ import jakarta.ws.rs.core.Response;
 @Path("02")
 public class Test02Controller extends AbstractAsyncTestController {
 
-    private static final int DEFAULT_LENGTH = 1000;
+    protected static final int DEFAULT_LENGTH = 1000;
     
-    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    private static final SecureRandom RANDOM = new SecureRandom();
+    protected static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    protected static final SecureRandom RANDOM = new SecureRandom();
 
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })

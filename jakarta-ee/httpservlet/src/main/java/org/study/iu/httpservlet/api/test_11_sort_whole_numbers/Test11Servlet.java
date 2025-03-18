@@ -14,14 +14,14 @@ import jakarta.servlet.annotation.WebServlet;
 @WebServlet(value = "/api/11", asyncSupported = true)
 public class Test11Servlet extends AbstractAsyncTestServlet {
 
-    private static final int DEFAULT_ARRAY_SIZE = 1000;
-    private static final int DEFAULT_MIN_VALUE = 0;
-    private static final int DEFAULT_MAX_VALUE = 1000;
+    protected static final int DEFAULT_ARRAY_SIZE = 1000;
+    protected static final int DEFAULT_MIN_VALUE = 0;
+    protected static final int DEFAULT_MAX_VALUE = 1000;
     
-    private static final Random RANDOM = new Random();
+    protected static final Random RANDOM = new Random();
     
     @Override
-    protected JsonObject executeTest(JsonObject jsonInput) {
+    protected JsonObject test(JsonObject jsonInput) {
         final int arraySize = jsonInput.getInt("arraySize", DEFAULT_ARRAY_SIZE);
         final int minValue = jsonInput.getInt("minValue", DEFAULT_MIN_VALUE);
         final int maxValue = jsonInput.getInt("maxValue", DEFAULT_MAX_VALUE);

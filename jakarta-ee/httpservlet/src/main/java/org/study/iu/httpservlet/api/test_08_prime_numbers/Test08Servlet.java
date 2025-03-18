@@ -14,10 +14,10 @@ import jakarta.servlet.annotation.WebServlet;
 @WebServlet(value = "/api/08", asyncSupported = true)
 public class Test08Servlet extends AbstractAsyncTestServlet {
 
-    private static final int DEFAULT_AMOUNT = 1000;
+    protected static final int DEFAULT_AMOUNT = 1000;
     
     @Override
-    protected JsonObject executeTest(JsonObject jsonInput) {
+    protected JsonObject test(JsonObject jsonInput) {
         final int amount = jsonInput.getInt("amount", DEFAULT_AMOUNT);
         
         ArrayList<Integer> primes = new ArrayList<>();

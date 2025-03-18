@@ -9,7 +9,7 @@ import jakarta.servlet.annotation.WebServlet;
 @WebServlet(value = "/api/01", asyncSupported = true)
 public class Test01Servlet extends AbstractAsyncTestServlet {
     @Override
-    protected JsonObject executeTest(JsonObject jsonInput) {
+    protected JsonObject test(JsonObject jsonInput) {
         final String name = jsonInput.getString("name");
 
         return Json.createObjectBuilder()

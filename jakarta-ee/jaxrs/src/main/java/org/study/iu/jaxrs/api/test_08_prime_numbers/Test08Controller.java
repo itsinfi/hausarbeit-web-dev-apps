@@ -20,7 +20,7 @@ import jakarta.ws.rs.core.Response;
 @Path("08")
 public class Test08Controller extends AbstractAsyncTestController {
 
-    private static final int DEFAULT_AMOUNT = 1000;
+    protected static final int DEFAULT_AMOUNT = 1000;
 
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })

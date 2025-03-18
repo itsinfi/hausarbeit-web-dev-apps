@@ -11,13 +11,13 @@ import jakarta.servlet.annotation.WebServlet;
 @WebServlet(value = "/api/02", asyncSupported = true)
 public class Test02Servlet extends AbstractAsyncTestServlet {
 
-    private static final int DEFAULT_LENGTH = 1000;
+    protected static final int DEFAULT_LENGTH = 1000;
     
-    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    private static final SecureRandom RANDOM = new SecureRandom();
+    protected static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    protected static final SecureRandom RANDOM = new SecureRandom();
     
     @Override
-    protected JsonObject executeTest(JsonObject jsonInput) {
+    protected JsonObject test(JsonObject jsonInput) {
         final int length = jsonInput.getInt("length", DEFAULT_LENGTH);
 
         final StringBuilder stringBuilder = new StringBuilder(length);

@@ -11,12 +11,12 @@ import jakarta.servlet.annotation.WebServlet;
 @WebServlet(value = "/api/07", asyncSupported = true)
 public class Test07Servlet extends AbstractAsyncTestServlet {
     
-    private static final int DEFAULT_ITERATIONS = 1000;
+    protected static final int DEFAULT_ITERATIONS = 1000;
     
-    private static final Random RANDOM = new Random();
+    protected static final Random RANDOM = new Random();
     
     @Override
-    protected JsonObject executeTest(JsonObject jsonInput) {
+    protected JsonObject test(JsonObject jsonInput) {
         final int iterations = jsonInput.getInt("iterations", DEFAULT_ITERATIONS);
         
         int finiteCount = 0;

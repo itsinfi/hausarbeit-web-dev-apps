@@ -10,20 +10,21 @@ import org.bouncycastle.util.encoders.Hex;
 import org.study.iu.httpservlet.classes.AbstractAsyncTestServlet;
 
 import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.servlet.annotation.WebServlet;
 
 @WebServlet(value = "/api/14", asyncSupported = true)
 public class Test14Servlet extends AbstractAsyncTestServlet {
+    protected static final int DEFAULT_ARGON2_ITERATIONS = 3;
+    protected static final int DEFAULT_ARGON2_PARALLELISM = 4;
+    protected static final int DEFAULT_ARGON2_MEMORY_IN_KB = 65536;
+    protected static final int DEFAULT_SALT_SIZE = 128;
 
-    private static final int DEFAULT_ARGON2_ITERATIONS = 3;
-    private static final int DEFAULT_ARGON2_PARALLELISM = 4;
-    private static final int DEFAULT_ARGON2_MEMORY_IN_KB = 65536;
-    private static final int DEFAULT_SALT_SIZE = 128;
-
-    private static final SecureRandom RANDOM = new SecureRandom();
+    protected static final SecureRandom RANDOM = new SecureRandom();
     
-    private String hashPassword(String password, int iterations, int parallelism, int memoryInKb, int saltSize) {
+    protected String hashPassword(String password, int iterations, int parallelism, int memoryInKb, int saltSize) {
         byte[] salt = new byte[saltSize / 8];
         RANDOM.nextBytes(salt);
 
@@ -49,7 +50,7 @@ public class Test14Servlet extends AbstractAsyncTestServlet {
         return saltHex + "$" + hashHex;
     }
     
-    private boolean verifyPassword(String password, String storedHash, int iterations, int parallelism, int memoryInKb, int saltSize) {
+    protected boolean verifyPassword(String password, String storedHash, int iterations, int parallelism, int memoryInKb, int saltSize) {
         String[] parts = storedHash.split("\\$");
         String storedSaltHex = parts[0];
         String storedHashHex = parts[1];
@@ -76,22 +77,29 @@ public class Test14Servlet extends AbstractAsyncTestServlet {
     }
     
     @Override
-    protected JsonObject executeTest(JsonObject jsonInput) {
+    protected JsonObject test(JsonObject jsonInput) {
         final String password = jsonInput.getString("password");
+        final int taskAmount = jsonInput.getInt("taskAmount", DEFAULT_THREADS);
         final int iterations = jsonInput.getInt("iterations", DEFAULT_ARGON2_ITERATIONS);
         final int parallelism = jsonInput.getInt("parallelism", DEFAULT_ARGON2_PARALLELISM);
         final int memoryInKb = jsonInput.getInt("memoryInKb", DEFAULT_ARGON2_MEMORY_IN_KB);
         final int saltSize = jsonInput.getInt("saltSize", DEFAULT_SALT_SIZE);
 
-        final String hashedPassword = hashPassword(password, iterations, parallelism, memoryInKb, saltSize);
+        JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
 
-        final boolean checkAuth = verifyPassword(password, hashedPassword, iterations, parallelism, memoryInKb, saltSize);
+        for (int i = 0; i < taskAmount; i++) {
+            String hashedPassword = hashPassword(password, iterations, parallelism, memoryInKb, saltSize);
+            boolean checkAuth = verifyPassword(password, hashedPassword, iterations, parallelism, memoryInKb, saltSize);
 
-        JsonObject hashPasswordObject = Json
-                .createObjectBuilder()
-                .add("hashedPassword", hashedPassword)
-                .add("checkAuth", checkAuth)
-                .build();
+            JsonObject result = Json.createObjectBuilder()
+                    .add("hashedPassword", hashedPassword)
+                    .add("checkAuth", checkAuth)
+                    .build();
+
+            jsonArrayBuilder.add(result);
+        }
+
+        JsonArray result = jsonArrayBuilder.build();
 
         return Json.createObjectBuilder()
                 .add("password", password)
@@ -99,7 +107,8 @@ public class Test14Servlet extends AbstractAsyncTestServlet {
                 .add("parallelism", parallelism)
                 .add("memoryInKb", memoryInKb)
                 .add("saltSize", saltSize)
-                .add("result", hashPasswordObject)
+                .add("taskAmount", taskAmount)
+                .add("result", result)
                 .build();
     }
 }

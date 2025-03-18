@@ -22,12 +22,12 @@ import jakarta.ws.rs.core.Response;
 @Path("14")
 public class Test14Controller extends AbstractAsyncTestController {
 
-    private static final int DEFAULT_ARGON2_ITERATIONS = 3;
-    private static final int DEFAULT_ARGON2_PARALLELISM = 4;
-    private static final int DEFAULT_ARGON2_MEMORY_IN_KB = 65536;
-    private static final int DEFAULT_SALT_SIZE = 128;
+    protected static final int DEFAULT_ARGON2_ITERATIONS = 3;
+    protected static final int DEFAULT_ARGON2_PARALLELISM = 4;
+    protected static final int DEFAULT_ARGON2_MEMORY_IN_KB = 65536;
+    protected static final int DEFAULT_SALT_SIZE = 128;
 
-    private static final SecureRandom RANDOM = new SecureRandom();
+    protected static final SecureRandom RANDOM = new SecureRandom();
 
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })

@@ -11,16 +11,16 @@ import jakarta.ws.rs.core.Response;
 
 public abstract class AbstractAsyncTestController {
     
-    private static final String THREAD_MODE = System.getenv("THREAD_MODE");
+    protected static final String THREAD_MODE = System.getenv("THREAD_MODE");
 
-    private static final int THREAD_POOL_SIZE = Integer.parseInt(System.getenv("THREAD_POOL_SIZE"));
+    protected static final int THREAD_POOL_SIZE = Integer.parseInt(System.getenv("THREAD_POOL_SIZE"));
     
     protected abstract JsonObject executeTest(JsonObject jsonInput);
     
     @Resource
     protected ManagedExecutorService managedExecutor;
-    private static final ExecutorService threadPoolExecutor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
-    private static final ExecutorService virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor();
+    protected static final ExecutorService threadPoolExecutor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+    protected static final ExecutorService virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor();
     
     // private handleError(Throwable ex, AsyncContext asyncContext) {}
 

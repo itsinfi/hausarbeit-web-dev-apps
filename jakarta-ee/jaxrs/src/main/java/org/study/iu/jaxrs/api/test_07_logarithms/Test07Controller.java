@@ -17,9 +17,9 @@ import jakarta.ws.rs.core.Response;
 @Path("07")
 public class Test07Controller extends AbstractAsyncTestController {
     
-    private static final int DEFAULT_ITERATIONS = 1000;
+    protected static final int DEFAULT_ITERATIONS = 1000;
     
-    private static final Random RANDOM = new Random();
+    protected static final Random RANDOM = new Random();
 
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })

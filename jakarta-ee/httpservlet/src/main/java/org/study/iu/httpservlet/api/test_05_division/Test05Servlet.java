@@ -11,14 +11,14 @@ import jakarta.servlet.annotation.WebServlet;
 @WebServlet(value = "/api/05", asyncSupported = true)
 public class Test05Servlet extends AbstractAsyncTestServlet {
     
-    private static final int DEFAULT_ITERATIONS = 1000;
-    private static final int DEFAULT_LOWER_BOUND = 1;
-    private static final int DEFAULT_UPPER_BOUND = 2;
+    protected static final int DEFAULT_ITERATIONS = 1000;
+    protected static final int DEFAULT_LOWER_BOUND = 1;
+    protected static final int DEFAULT_UPPER_BOUND = 2;
     
-    private static final Random RANDOM = new Random();
+    protected static final Random RANDOM = new Random();
     
     @Override
-    protected JsonObject executeTest(JsonObject jsonInput) {
+    protected JsonObject test(JsonObject jsonInput) {
         final int iterations = jsonInput.getInt("iterations", DEFAULT_ITERATIONS);
         final int lowerBound = jsonInput.getInt("lowerBound", DEFAULT_LOWER_BOUND);
         final int upperBound = jsonInput.getInt("upperBound", DEFAULT_UPPER_BOUND);

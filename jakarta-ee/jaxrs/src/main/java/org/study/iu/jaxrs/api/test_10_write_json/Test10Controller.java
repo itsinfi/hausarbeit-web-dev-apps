@@ -20,13 +20,13 @@ import jakarta.ws.rs.core.Response;
 @Path("10")
 public class Test10Controller extends AbstractAsyncTestController {
 
-    private static final int DEFAULT_DEPTH = 3;
-    private static final int DEFAULT_OBJECTS_PER_LEVEL = 4;
-    private static final int DEFAULT_ARRAY_SIZE = 4;
-    private static final int DEFAULT_MIN_VALUE = 0;
-    private static final int DEFAULT_MAX_VALUE = 100;
+    protected static final int DEFAULT_DEPTH = 3;
+    protected static final int DEFAULT_OBJECTS_PER_LEVEL = 4;
+    protected static final int DEFAULT_ARRAY_SIZE = 4;
+    protected static final int DEFAULT_MIN_VALUE = 0;
+    protected static final int DEFAULT_MAX_VALUE = 100;
     
-    private static final Random RANDOM = new Random();
+    protected static final Random RANDOM = new Random();
     
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
