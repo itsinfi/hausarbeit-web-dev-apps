@@ -61,8 +61,8 @@ public abstract class AbstractAsyncTestServlet extends HttpServlet {
         HttpServletResponse res = (HttpServletResponse) asyncContext.getResponse();
         
         JsonObject jsonError = Json.createObjectBuilder()
-        .add("error", ex.getMessage())
-        .build();
+                .add("error", ex.getMessage())
+                .build();
         
         res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         
@@ -83,21 +83,12 @@ public abstract class AbstractAsyncTestServlet extends HttpServlet {
         res.setCharacterEncoding("UTF-8");
 
         AsyncContext asyncContext = req.startAsync();
-        // ThreadMonitor.printAllThreads();
 
         ExecutorService executor = getExecutor(THREAD_MODE);
 
         CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
                 .thenApply(result -> sendResponse(res, result, asyncContext))
                 .exceptionally(ex -> handleError(ex, asyncContext));
-
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            System.out.println(e.getMessage());
-        }
-        // ThreadMonitor.printAllThreads();
-        // ThreadMonitor.countThreads();
     }
     
     protected ExecutorService getExecutor(String threadMode) {

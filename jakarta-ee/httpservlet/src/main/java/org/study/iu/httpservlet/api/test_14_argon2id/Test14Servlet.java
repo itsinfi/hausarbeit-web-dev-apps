@@ -21,6 +21,7 @@ public class Test14Servlet extends AbstractAsyncTestServlet {
     protected static final int DEFAULT_ARGON2_PARALLELISM = 4;
     protected static final int DEFAULT_ARGON2_MEMORY_IN_KB = 65536;
     protected static final int DEFAULT_SALT_SIZE = 128;
+    protected static final int DEFAULT_TASK_AMOUNT = 10;
 
     protected static final SecureRandom RANDOM = new SecureRandom();
     
@@ -79,11 +80,11 @@ public class Test14Servlet extends AbstractAsyncTestServlet {
     @Override
     protected JsonObject test(JsonObject jsonInput) {
         final String password = jsonInput.getString("password");
-        final int taskAmount = jsonInput.getInt("taskAmount", DEFAULT_THREADS);
         final int iterations = jsonInput.getInt("iterations", DEFAULT_ARGON2_ITERATIONS);
         final int parallelism = jsonInput.getInt("parallelism", DEFAULT_ARGON2_PARALLELISM);
         final int memoryInKb = jsonInput.getInt("memoryInKb", DEFAULT_ARGON2_MEMORY_IN_KB);
         final int saltSize = jsonInput.getInt("saltSize", DEFAULT_SALT_SIZE);
+        final int taskAmount = jsonInput.getInt("taskAmount", DEFAULT_TASK_AMOUNT);
 
         JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
 

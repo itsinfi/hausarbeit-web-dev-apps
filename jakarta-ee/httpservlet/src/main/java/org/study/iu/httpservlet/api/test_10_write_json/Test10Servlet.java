@@ -14,13 +14,13 @@ import jakarta.servlet.annotation.WebServlet;
 @WebServlet(value = "/api/10", asyncSupported = true)
 public class Test10Servlet extends AbstractAsyncTestServlet {
 
-    protected static final int DEFAULT_DEPTH = 3;
-    protected static final int DEFAULT_OBJECTS_PER_LEVEL = 4;
-    protected static final int DEFAULT_ARRAY_SIZE = 4;
-    protected static final int DEFAULT_MIN_VALUE = 0;
-    protected static final int DEFAULT_MAX_VALUE = 100;
+    private static final int DEFAULT_DEPTH = 3;
+    private static final int DEFAULT_OBJECTS_PER_LEVEL = 4;
+    private static final int DEFAULT_ARRAY_SIZE = 4;
+    private static final int DEFAULT_MIN_VALUE = 0;
+    private static final int DEFAULT_MAX_VALUE = 100;
     
-    protected static final Random RANDOM = new Random();
+    private static final Random RANDOM = new Random();
 
     private JsonObject generateJsonObject(int depth, int objectsPerLevel, int arraySize, int minValue, int maxValue) {
         final JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
