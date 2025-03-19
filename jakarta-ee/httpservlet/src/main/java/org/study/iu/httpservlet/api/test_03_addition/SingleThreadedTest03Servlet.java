@@ -1,4 +1,4 @@
-package org.study.iu.httpservlet.api.test_06_powers;
+package org.study.iu.httpservlet.api.test_03_addition;
 
 import java.util.Random;
 
@@ -8,14 +8,14 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.servlet.annotation.WebServlet;
 
-@WebServlet(value = "/api/06", asyncSupported = true)
-public class Test06Servlet extends AbstractAsyncTestServlet {
+@WebServlet(value = "/api/03", asyncSupported = true)
+public class SingleThreadedTest03Servlet extends AbstractAsyncTestServlet {
     
     protected static final int DEFAULT_ITERATIONS = 1000;
-    protected static final int DEFAULT_LOWER_BOUND = -10;
-    protected static final int DEFAULT_UPPER_BOUND = 10;
+    protected static final int DEFAULT_LOWER_BOUND = 0;
+    protected static final int DEFAULT_UPPER_BOUND = 1;
     
-    protected static final Random RANDOM = new Random();
+    private static final Random RANDOM = new Random();
     
     @Override
     protected JsonObject test(JsonObject jsonInput) {
@@ -27,7 +27,7 @@ public class Test06Servlet extends AbstractAsyncTestServlet {
 
         for (int i = 0; i < iterations; i++) {
             final double randomRealNumber = RANDOM.nextDouble(lowerBound, upperBound);
-            sum += Math.pow(Math.E, randomRealNumber);
+            sum += randomRealNumber;
         }
 
         return Json.createObjectBuilder()

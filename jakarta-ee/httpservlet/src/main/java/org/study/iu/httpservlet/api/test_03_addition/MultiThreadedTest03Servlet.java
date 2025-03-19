@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -14,7 +16,7 @@ import jakarta.json.JsonObject;
 import jakarta.servlet.annotation.WebServlet;
 
 @WebServlet(value = "/api/03_multi", asyncSupported = true)
-public class MultiTest03Servlet extends Test03Servlet implements MultiThreadingTestable {
+public class MultiThreadedTest03Servlet extends SingleThreadedTest03Servlet implements MultiThreadingTestable {
     @Override
     protected JsonObject test(JsonObject jsonInput) {
         final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
@@ -30,24 +32,28 @@ public class MultiTest03Servlet extends Test03Servlet implements MultiThreadingT
         
         double sum = 0.0;
 
+        final Function<Integer, Double> task = (Integer a) -> {
+            int threadIterations = iterations / threads;
+
+            if (a == threads - 1) {
+                threadIterations += iterations % threads;
+            }
+            
+            double threadSum = 0.0;
+
+            for (int i = 0; i < threadIterations; i++) {
+                final double randomRealNumber = ThreadLocalRandom.current().nextDouble(lowerBound, upperBound);
+                threadSum += randomRealNumber;
+            }
+
+            return threadSum;
+        };
+
         final List<CompletableFuture<Double>> futures = IntStream
                 .range(0, threads)
                 .mapToObj(a -> CompletableFuture
                         .supplyAsync(() -> {
-                            int threadIterations = iterations / threads;
-
-                            if (a == threads - 1) {
-                                threadIterations += iterations % threads;
-                            }
-                            
-                            double threadSum = 0.0;
-
-                            for (int i = 0; i < threadIterations; i++) {
-                                final double randomRealNumber = RANDOM.nextDouble(lowerBound, upperBound);
-                                threadSum += randomRealNumber;
-                            }
-
-                            return threadSum;
+                            return task.apply(a);
                         }, executor))
                 .collect(Collectors.toList());
 

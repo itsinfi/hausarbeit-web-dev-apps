@@ -1,12 +1,17 @@
 package org.study.iu.httpservlet.api.test_14_argon2id;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
+import org.bouncycastle.crypto.params.Argon2Parameters;
+import org.bouncycastle.util.encoders.Hex;
 import org.study.iu.httpservlet.interfaces.MultiThreadingTestable;
 
 import jakarta.json.Json;
@@ -16,7 +21,34 @@ import jakarta.json.JsonObject;
 import jakarta.servlet.annotation.WebServlet;
 
 @WebServlet(value = "/api/14_multi", asyncSupported = true)
-public class MultiTest14Servlet extends Test14Servlet implements MultiThreadingTestable {
+public class MultiThreadedTest14Servlet extends SingleThreadedTest14Servlet implements MultiThreadingTestable {
+
+    @Override
+    protected String hashPassword(String password, int iterations, int parallelism, int memoryInKb, int saltSize) {
+        byte[] salt = new byte[saltSize / 8];
+        ThreadLocalRandom.current().nextBytes(salt);
+
+        Argon2Parameters params = new Argon2Parameters.Builder(Argon2Parameters.ARGON2_id)
+                .withIterations(iterations)
+                .withParallelism(parallelism)
+                .withMemoryAsKB(memoryInKb)
+                .withSalt(salt)
+                .build();
+
+        Argon2BytesGenerator generator = new Argon2BytesGenerator();
+        generator.init(params);
+
+        byte[] passwordBytes = password.getBytes(StandardCharsets.UTF_8);
+
+        byte[] hash = new byte[saltSize / 4];
+
+        generator.generateBytes(passwordBytes, hash, 0, hash.length);
+
+        String saltHex = new String(Hex.encode(salt));
+        String hashHex = new String(Hex.encode(hash));
+
+        return saltHex + "$" + hashHex;
+    }
     
     @Override
     protected JsonObject test(JsonObject jsonInput) {

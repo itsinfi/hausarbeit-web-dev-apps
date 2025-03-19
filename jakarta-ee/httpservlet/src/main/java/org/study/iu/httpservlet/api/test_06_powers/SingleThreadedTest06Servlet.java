@@ -1,4 +1,4 @@
-package org.study.iu.httpservlet.api.test_04_multiplication;
+package org.study.iu.httpservlet.api.test_06_powers;
 
 import java.util.Random;
 
@@ -8,14 +8,14 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.servlet.annotation.WebServlet;
 
-@WebServlet(value = "/api/04", asyncSupported = true)
-public class Test04Servlet extends AbstractAsyncTestServlet {
+@WebServlet(value = "/api/06", asyncSupported = true)
+public class SingleThreadedTest06Servlet extends AbstractAsyncTestServlet {
     
     protected static final int DEFAULT_ITERATIONS = 1000;
-    protected static final int DEFAULT_LOWER_BOUND = 1;
-    protected static final int DEFAULT_UPPER_BOUND = 2;
+    protected static final int DEFAULT_LOWER_BOUND = -10;
+    protected static final int DEFAULT_UPPER_BOUND = 10;
     
-    protected static final Random RANDOM = new Random();
+    private static final Random RANDOM = new Random();
     
     @Override
     protected JsonObject test(JsonObject jsonInput) {
@@ -23,18 +23,18 @@ public class Test04Servlet extends AbstractAsyncTestServlet {
         final int lowerBound = jsonInput.getInt("lowerBound", DEFAULT_LOWER_BOUND);
         final int upperBound = jsonInput.getInt("upperBound", DEFAULT_UPPER_BOUND);
         
-        double product = 1.0;
+        double sum = 0.0;
 
         for (int i = 0; i < iterations; i++) {
             final double randomRealNumber = RANDOM.nextDouble(lowerBound, upperBound);
-            product *= randomRealNumber;
+            sum += Math.pow(Math.E, randomRealNumber);
         }
 
         return Json.createObjectBuilder()
                 .add("iterations", iterations)
                 .add("lowerBound", lowerBound)
                 .add("upperBound", upperBound)
-                .add("result", product)
+                .add("result", sum)
                 .build();
     }
 }

@@ -12,7 +12,7 @@ import jakarta.json.JsonObjectBuilder;
 import jakarta.servlet.annotation.WebServlet;
 
 @WebServlet(value = "/api/10", asyncSupported = true)
-public class Test10Servlet extends AbstractAsyncTestServlet {
+public class SingleThreadedTest10Servlet extends AbstractAsyncTestServlet {
 
     private static final int DEFAULT_DEPTH = 3;
     private static final int DEFAULT_OBJECTS_PER_LEVEL = 4;

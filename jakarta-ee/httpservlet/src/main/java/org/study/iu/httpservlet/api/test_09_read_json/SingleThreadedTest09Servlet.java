@@ -1,8 +1,6 @@
-package org.study.iu.httpservlet.api.test_13_linq_streams;
+package org.study.iu.httpservlet.api.test_09_read_json;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 import org.study.iu.httpservlet.classes.AbstractAsyncTestServlet;
 
@@ -14,10 +12,10 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 import jakarta.servlet.annotation.WebServlet;
 
-@WebServlet(value = "/api/13", asyncSupported = true)
-public class Test13Servlet extends AbstractAsyncTestServlet {
-    
-    private void flattenJson(JsonValue json, ArrayList<Double> numbers) {
+@WebServlet(value = "/api/09", asyncSupported = true)
+public class SingleThreadedTest09Servlet extends AbstractAsyncTestServlet {
+
+    protected void flattenJson(JsonValue json, ArrayList<Double> numbers) {
         switch (json.getValueType()) {
             case OBJECT -> {
                 final JsonObject jsonObject = json.asJsonObject();
@@ -28,16 +26,16 @@ public class Test13Servlet extends AbstractAsyncTestServlet {
 
             case ARRAY -> {
                 final JsonArray jsonArray = json.asJsonArray();
-                double sum = 0.0;
                 for (JsonValue element : jsonArray) {
-                    sum += ((JsonNumber) element).doubleValue();
+                    this.flattenJson(element, numbers);
                 }
-                double avg = sum / jsonArray.size();
-                numbers.add(avg);
             }
 
-            default -> {
+            case NUMBER -> {
+                numbers.add(((JsonNumber) json).doubleValue());
             }
+
+            default -> {}
         }
     }
     
@@ -46,8 +44,6 @@ public class Test13Servlet extends AbstractAsyncTestServlet {
         final ArrayList<Double> numbers = new ArrayList<>();
 
         this.flattenJson(jsonInput, numbers);
-
-        Collections.sort(numbers, Comparator.naturalOrder());
 
         final JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
 
@@ -58,7 +54,7 @@ public class Test13Servlet extends AbstractAsyncTestServlet {
         final JsonArray result = jsonArrayBuilder.build();
 
         return Json.createObjectBuilder()
-                .add("amount", numbers.size())
+                .add("found", result.size())
                 .add("result", result)
                 .build();
     }

@@ -12,13 +12,13 @@ import jakarta.json.JsonObject;
 import jakarta.servlet.annotation.WebServlet;
 
 @WebServlet(value = "/api/12", asyncSupported = true)
-public class Test12Servlet extends AbstractAsyncTestServlet {
+public class SingleThreadedTest12Servlet extends AbstractAsyncTestServlet {
 
     protected static final int DEFAULT_ARRAY_SIZE = 1000;
     protected static final int DEFAULT_MIN_VALUE = 0;
     protected static final int DEFAULT_MAX_VALUE = 1000;
     
-    protected static final Random RANDOM = new Random();
+    private static final Random RANDOM = new Random();
     
     @Override
     protected JsonObject test(JsonObject jsonInput) {

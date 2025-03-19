@@ -9,11 +9,11 @@ import jakarta.json.JsonObject;
 import jakarta.servlet.annotation.WebServlet;
 
 @WebServlet(value = "/api/07", asyncSupported = true)
-public class Test07Servlet extends AbstractAsyncTestServlet {
+public class SingleThreadedTest07Servlet extends AbstractAsyncTestServlet {
     
     protected static final int DEFAULT_ITERATIONS = 1000;
     
-    protected static final Random RANDOM = new Random();
+    private static final Random RANDOM = new Random();
     
     @Override
     protected JsonObject test(JsonObject jsonInput) {

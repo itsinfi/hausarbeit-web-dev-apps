@@ -6,16 +6,14 @@ import java.util.concurrent.CompletableFuture;
 
 import org.study.iu.httpservlet.interfaces.MultiThreadingTestable;
 
-import jakarta.json.Json;
 import jakarta.json.JsonArray;
-import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonNumber;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 import jakarta.servlet.annotation.WebServlet;
 
 @WebServlet(value = "/api/09_multi", asyncSupported = true)
-public class MultiTest09Servlet extends Test09Servlet implements MultiThreadingTestable {
+public class MultiThreadedTest09Servlet extends SingleThreadedTest09Servlet implements MultiThreadingTestable {
 
     @Override
     protected void flattenJson(JsonValue json, ArrayList<Double> numbers) {
@@ -50,25 +48,5 @@ public class MultiTest09Servlet extends Test09Servlet implements MultiThreadingT
 
             default -> {}
         }
-    }
-    
-    @Override
-    protected JsonObject test(JsonObject jsonInput) {
-        final ArrayList<Double> numbers = new ArrayList<>();
-
-        this.flattenJson(jsonInput, numbers);
-
-        final JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
-
-        for (Double number : numbers) {
-            jsonArrayBuilder.add(number);
-        }
-
-        final JsonArray result = jsonArrayBuilder.build();
-
-        return Json.createObjectBuilder()
-                .add("found", result.size())
-                .add("result", result)
-                .build();
     }
 }

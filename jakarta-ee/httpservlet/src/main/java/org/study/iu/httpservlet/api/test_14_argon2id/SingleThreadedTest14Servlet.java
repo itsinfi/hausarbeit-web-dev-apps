@@ -16,15 +16,15 @@ import jakarta.json.JsonObject;
 import jakarta.servlet.annotation.WebServlet;
 
 @WebServlet(value = "/api/14", asyncSupported = true)
-public class Test14Servlet extends AbstractAsyncTestServlet {
+public class SingleThreadedTest14Servlet extends AbstractAsyncTestServlet {
     protected static final int DEFAULT_ARGON2_ITERATIONS = 3;
     protected static final int DEFAULT_ARGON2_PARALLELISM = 4;
     protected static final int DEFAULT_ARGON2_MEMORY_IN_KB = 65536;
     protected static final int DEFAULT_SALT_SIZE = 128;
     protected static final int DEFAULT_TASK_AMOUNT = 10;
 
-    protected static final SecureRandom RANDOM = new SecureRandom();
-    
+    private static final SecureRandom RANDOM = new SecureRandom();
+
     protected String hashPassword(String password, int iterations, int parallelism, int memoryInKb, int saltSize) {
         byte[] salt = new byte[saltSize / 8];
         RANDOM.nextBytes(salt);

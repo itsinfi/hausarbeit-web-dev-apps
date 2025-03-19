@@ -20,7 +20,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public abstract class AbstractAsyncTestServlet extends HttpServlet {
 
-    protected static final String THREAD_MODE = System.getenv("THREAD_MODE"); // TODO:
+    protected static final String THREAD_MODE = System.getenv("THREAD_MODE");
     protected static final int THREAD_POOL_SIZE = Integer.parseInt(System.getenv("THREAD_POOL_SIZE"));
     
     protected abstract JsonObject test(JsonObject jsonInput);
@@ -59,6 +59,8 @@ public abstract class AbstractAsyncTestServlet extends HttpServlet {
 
     private Void handleError(Throwable ex, AsyncContext asyncContext) {
         HttpServletResponse res = (HttpServletResponse) asyncContext.getResponse();
+
+        ex.printStackTrace();
         
         JsonObject jsonError = Json.createObjectBuilder()
                 .add("error", ex.getMessage())
