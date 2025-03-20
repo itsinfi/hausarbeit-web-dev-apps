@@ -1,6 +1,7 @@
 package org.study.iu.httpservlet.api.test_09_read_json;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.study.iu.httpservlet.classes.AbstractAsyncTestServlet;
 
@@ -15,7 +16,7 @@ import jakarta.servlet.annotation.WebServlet;
 @WebServlet(value = "/api/09", asyncSupported = true)
 public class SingleThreadedTest09Servlet extends AbstractAsyncTestServlet {
 
-    protected void flattenJson(JsonValue json, ArrayList<Double> numbers) {
+    private void flattenJson(JsonValue json, List<Double> numbers) {
         switch (json.getValueType()) {
             case OBJECT -> {
                 final JsonObject jsonObject = json.asJsonObject();
@@ -41,7 +42,7 @@ public class SingleThreadedTest09Servlet extends AbstractAsyncTestServlet {
     
     @Override
     protected JsonObject test(JsonObject jsonInput) {
-        final ArrayList<Double> numbers = new ArrayList<>();
+        final List<Double> numbers = new ArrayList<>();
 
         this.flattenJson(jsonInput, numbers);
 

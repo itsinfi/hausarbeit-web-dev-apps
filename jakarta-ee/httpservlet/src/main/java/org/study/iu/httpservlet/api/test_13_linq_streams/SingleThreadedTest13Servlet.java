@@ -17,13 +17,12 @@ import jakarta.servlet.annotation.WebServlet;
 @WebServlet(value = "/api/13", asyncSupported = true)
 public class SingleThreadedTest13Servlet extends AbstractAsyncTestServlet {
     
-    protected void flattenJson(JsonValue json, ArrayList<Double> numbers) {
+    private void flattenJson(JsonValue json, ArrayList<Double> numbers) {
         switch (json.getValueType()) {
             case OBJECT -> {
                 final JsonObject jsonObject = json.asJsonObject();
-                for (String key : jsonObject.keySet()) {
-                    this.flattenJson(jsonObject.get(key), numbers);
-                }
+                // TODO: test this out
+                jsonObject.values().forEach(value -> this.flattenJson(value, numbers));
             }
 
             case ARRAY -> {
