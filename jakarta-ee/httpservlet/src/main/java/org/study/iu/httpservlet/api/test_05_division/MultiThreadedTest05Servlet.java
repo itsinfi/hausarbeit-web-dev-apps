@@ -1,5 +1,7 @@
 package org.study.iu.httpservlet.api.test_05_division;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -30,26 +32,26 @@ public class MultiThreadedTest05Servlet extends SingleThreadedTest05Servlet impl
         final int lowerBound = jsonInput.getInt("lowerBound", DEFAULT_LOWER_BOUND);
         final int upperBound = jsonInput.getInt("upperBound", DEFAULT_UPPER_BOUND);
         
-        double quotient = Double.MAX_VALUE;
+        BigDecimal totalProduct = BigDecimal.ONE;
 
-        final Function<Integer, Double> task = (Integer a) -> {
+        final Function<Integer, BigDecimal> task = (Integer a) -> {
             int threadIterations = iterations / threads;
 
             if (a == threads - 1) {
                 threadIterations += iterations % threads;
             }
 
-            double threadQuotient = Double.MAX_VALUE;
+            BigDecimal threadProduct = BigDecimal.ONE;
 
             for (int i = 0; i < threadIterations; i++) {
                 final double randomRealNumber = ThreadLocalRandom.current().nextDouble(lowerBound, upperBound);
-                threadQuotient /= randomRealNumber;
+                threadProduct = threadProduct.multiply(BigDecimal.valueOf(randomRealNumber));
             }
 
-            return threadQuotient;
+            return threadProduct;
         };
 
-        final List<CompletableFuture<Double>> futures = IntStream
+        final List<CompletableFuture<BigDecimal>> futures = IntStream
                 .range(0, threads)
                 .mapToObj(a -> CompletableFuture
                         .supplyAsync(() -> {
@@ -61,13 +63,22 @@ public class MultiThreadedTest05Servlet extends SingleThreadedTest05Servlet impl
 
         allDone.join();
 
-        for (CompletableFuture<Double> future : futures) {
+        for (CompletableFuture<BigDecimal> future : futures) {
             try {
-                quotient /= future.get();
+                totalProduct = totalProduct.multiply(future.get());
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }
+
+        BigDecimal quotient = BigDecimal
+                .valueOf(Double.MAX_VALUE)
+                .divide(totalProduct, 20, RoundingMode.HALF_UP);
+
+        System.out.println("totalProduct: " + totalProduct.toEngineeringString());
+        System.out.println("quotient: " + quotient);
+
+        double result = quotient.doubleValue();
 
         return Json.createObjectBuilder()
                 .add("usedThreadMode",taskThreadMode)
@@ -75,7 +86,7 @@ public class MultiThreadedTest05Servlet extends SingleThreadedTest05Servlet impl
                 .add("iterations", iterations)
                 .add("lowerBound", lowerBound)
                 .add("upperBound", upperBound)
-                .add("result", quotient)
+                .add("result", result)
                 .build();
     }
 }
