@@ -21,8 +21,9 @@ public class SingleThreadedTest13Servlet extends AbstractAsyncTestServlet {
         switch (json.getValueType()) {
             case OBJECT -> {
                 final JsonObject jsonObject = json.asJsonObject();
-                // TODO: test this out
-                jsonObject.values().forEach(value -> this.flattenJson(value, numbers));
+                for (JsonValue value : jsonObject.values()) {
+                    flattenJson(value, numbers);
+                }
             }
 
             case ARRAY -> {

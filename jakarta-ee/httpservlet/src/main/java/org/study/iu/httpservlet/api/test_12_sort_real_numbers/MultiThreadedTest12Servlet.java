@@ -1,12 +1,10 @@
 package org.study.iu.httpservlet.api.test_12_sort_real_numbers;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -20,35 +18,6 @@ import jakarta.servlet.annotation.WebServlet;
 
 @WebServlet(value = "/api/12_multi", asyncSupported = true)
 public class MultiThreadedTest12Servlet extends SingleThreadedTest12Servlet implements MultiThreadingTestable {
-    private double[] parallelMerge(List<double[]> sortedArrays, ExecutorService executor) {
-        while (sortedArrays.size() > 1) {
-            final List<double[]> sortedArraysCopy = new ArrayList<>(sortedArrays);
-
-            final List<CompletableFuture<double[]>> mergeFutures = IntStream.range(0, sortedArraysCopy.size() / 2)
-                    .mapToObj(a -> CompletableFuture.supplyAsync(
-                            () -> merge(sortedArraysCopy.get(2 * a), sortedArraysCopy.get(2 * a + 1)), executor))
-                    .collect(Collectors.toList());
-
-            if (sortedArraysCopy.size() % 2 == 1) {
-                mergeFutures.add(CompletableFuture.completedFuture(sortedArraysCopy.get(sortedArraysCopy.size() - 1)));
-            }
-
-            sortedArrays = mergeFutures.stream().map(CompletableFuture::join).collect(Collectors.toList());
-        }
-        return sortedArrays.get(0);
-    }
-
-    private double[] merge(double[] left, double[] right) {
-        double[] merged = new double[left.length + right.length];
-        int i = 0, j = 0, k = 0;
-        while (i < left.length && j < right.length) {
-            merged[k++] = (left[i] < right[j]) ? left[i++] : right[j++];
-        }
-        while (i < left.length) merged[k++] = left[i++];
-        while (j < right.length) merged[k++] = right[j++];
-        return merged;
-    }
-
     @Override
     protected JsonObject test(JsonObject jsonInput) {
         final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
@@ -62,50 +31,55 @@ public class MultiThreadedTest12Servlet extends SingleThreadedTest12Servlet impl
         final int minValue = jsonInput.getInt("minValue", DEFAULT_MIN_VALUE);
         final int maxValue = jsonInput.getInt("maxValue", DEFAULT_MAX_VALUE);
 
-        Function<Integer, double[]> task = (Integer a) -> {
-            int threadArraySize = arraySize / threads;
-
-            if (a == threads - 1) {
-                threadArraySize += arraySize % threads;
-            }
-
-            double[] threadArray = ThreadLocalRandom.current().doubles(threadArraySize, minValue, maxValue + 1).toArray();
-
-            Arrays.sort(threadArray);
-            System.out.println("01: This is executed");
-            
-            return threadArray;
-        };
-
-        List<CompletableFuture<double[]>> futures = IntStream
+        final List<CompletableFuture<double[]>> futures = IntStream
                 .range(0, threads)
-                .mapToObj(a -> CompletableFuture.supplyAsync(() -> task.apply(a), executor))
+                .mapToObj(t -> CompletableFuture.supplyAsync(() -> {
+                    final int threadArraySize = arraySize / threads + (t < arraySize % threads ? 1 : 0);
+
+                    final double[] threadArray = new double[threadArraySize];
+
+                    final ThreadLocalRandom random = ThreadLocalRandom.current();
+
+                    for (int i = 0; i < threadArraySize; i++) {
+                        threadArray[i] = random.nextDouble(minValue, maxValue + 1);
+                    }
+
+                    return threadArray;
+                }, executor))
                 .collect(Collectors.toList());
 
-        System.out.println("02: This is executed");
+        final double[] array = CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new))
+                .thenApply(v -> {
+                    final double[] result = new double[arraySize];
+                    int index = 0;
 
-        List<double[]> sortedArrays = futures.stream()
-                .map(CompletableFuture::join)
-                .collect(Collectors.toList());
+                    for (final CompletableFuture<double[]> future : futures) {
+                        final double[] threadArray = future.join();
+                        System.arraycopy(threadArray, 0, result, index, threadArray.length);
+                        index += threadArray.length;
+                    }
 
-        System.out.println("03: This is executed");
+                    return result;
+                })
+                .join();
+        
+        Arrays.parallelSort(array);
 
-        double[] sortedArray = parallelMerge(sortedArrays, executor);
+        final JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
 
-        System.out.println("04: This is executed");
+        for (int i = 0; i < arraySize; i++) {
+            jsonArrayBuilder.add(array[i]);
+        }
 
-        JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
-        Arrays.stream(sortedArray).forEach(jsonArrayBuilder::add);
-
-        JsonArray jsonArray = jsonArrayBuilder.build();
-
+        final JsonArray result = jsonArrayBuilder.build();
+        
         return Json.createObjectBuilder()
                 .add("usedThreadMode", taskThreadMode)
                 .add("threads", threads)
                 .add("arraySize", arraySize)
                 .add("minValue", minValue)
                 .add("maxValue", maxValue)
-                .add("result", jsonArray)
+                .add("result", result)
                 .build();
     }
 }
