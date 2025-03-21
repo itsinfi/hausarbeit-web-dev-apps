@@ -21,14 +21,14 @@ public class MultiThreadedTest02Servlet extends SingleThreadedTest02Servlet impl
         final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
         final int threads = jsonInput.getInt("threads", DEFAULT_THREADS);
         ExecutorService executor = getExecutor(taskThreadMode);
-        if (executor == null || threads < 1) {
+        if (executor == null || threads <= 1) {
             return super.test(jsonInput);
         }
     
         final int length = jsonInput.getInt("length", DEFAULT_LENGTH);
 
         final Function<Integer, String> task = (Integer a) -> {
-            int threadLength = length / threads;
+            int threadLength = Math.floorDiv(length, threads);
 
             if (a == threads - 1) {
                 threadLength += length % threads;

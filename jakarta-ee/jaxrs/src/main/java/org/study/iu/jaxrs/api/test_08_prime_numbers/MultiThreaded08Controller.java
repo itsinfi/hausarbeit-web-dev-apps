@@ -23,7 +23,7 @@ public class MultiThreaded08Controller extends SingleThreadedTest08Controller im
         final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
         final int threads = jsonInput.getInt("threads", DEFAULT_THREADS);
         ExecutorService executor = getExecutor(taskThreadMode);
-        if (executor == null || threads < 1) {
+        if (executor == null || threads <= 1) {
             return super.test(jsonInput);
         }
 

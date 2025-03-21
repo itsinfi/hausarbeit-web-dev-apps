@@ -22,7 +22,7 @@ public class MultiThreaded03Controller extends SingleThreadedTest03Controller im
         final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
         final int threads = jsonInput.getInt("threads", DEFAULT_THREADS);
         ExecutorService executor = getExecutor(taskThreadMode);
-        if (executor == null || threads < 1) {
+        if (executor == null || threads <= 1) {
             return super.test(jsonInput);
         }
         
@@ -33,7 +33,7 @@ public class MultiThreaded03Controller extends SingleThreadedTest03Controller im
         double sum = 0.0;
 
         final Function<Integer, Double> task = (Integer a) -> {
-            int threadIterations = iterations / threads;
+            int threadIterations = Math.floorDiv(iterations, threads);
 
             if (a == threads - 1) {
                 threadIterations += iterations % threads;
