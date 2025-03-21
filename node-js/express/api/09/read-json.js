@@ -8,7 +8,7 @@ function flattenJson(json, numbers) {
     }
 }
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
     let numbers = [];
 
     flattenJson(req.body, numbers);

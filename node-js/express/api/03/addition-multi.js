@@ -1,11 +1,11 @@
-const { Worker } = require('worker_threads');
-const addition = require('./addition');
+const { Worker } = 'worker_threads';
+const addition = './addition.js';
 
 const DEFAULT_ITERATIONS = 1000;
 const DEFAULT_LOWER_BOUND = 0;
 const DEFAULT_UPPER_BOUND = 1;
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
     const threads = Number(req.body.threads) ?? DEFAULT_THREADS;
     const iterations = Number(req.body.iterations) ?? DEFAULT_ITERATIONS;
     const lowerBound = Number(req.body.lowerBound) ?? DEFAULT_LOWER_BOUND;

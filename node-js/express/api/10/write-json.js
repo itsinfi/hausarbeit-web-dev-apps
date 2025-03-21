@@ -25,7 +25,7 @@ function generateJsonArray(size, minValue, maxValue) {
     )
 }
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
     const depth = Number(req.body.depth) ?? DEFAULT_DEPTH;
     const objectsPerLevel = Number(req.body.objectsPerLevel) ?? DEFAULT_OBJECTS_PER_LEVEL;
     const arraySize = Number(req.body.arraySize) ?? DEFAULT_ARRAY_SIZE;

@@ -1,4 +1,4 @@
-const { parentPort } = require('worker_threads');
+import { parentPort } from 'worker_threads';
 
 parentPort.on('message', ({ thread, threads, iterations, upperBound, lowerBound }) => {
     let threadIterations = Math.floor(iterations / threads);

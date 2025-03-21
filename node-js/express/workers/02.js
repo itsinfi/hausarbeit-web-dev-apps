@@ -1,19 +1,19 @@
-const { parentPort } = require('worker_threads');
+import { move } from "piscina";
 
 const CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-parentPort.on('message', ({ thread, threads, length }) => {
+export default ({ thread, threads, length }) => {
     let threadLength = Math.floor(length / threads);
-
+    
     if (thread == threads - 1) {
         threadLength += length % threads;
     }
 
-    result = '';
+    let result = '';
 
     for (let i = 0; i < threadLength; i++) {
         result += CHARACTERS[Math.floor(Math.random() * (CHARACTERS.length + 1))];
     }
 
-    parentPort.postMessage(result);
-});
+    return result;
+}

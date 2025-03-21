@@ -1,4 +1,4 @@
-module.exports = async (req, res) => {
+export default async (req, res) => {
     const { name } = req.body;
 
     if (name) {

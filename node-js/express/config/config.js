@@ -1,1 +1,2 @@
-export default require('dotenv').config({ path: '../../.env' });
+import { config } from "dotenv";
+export default config;

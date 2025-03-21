@@ -1,5 +1,5 @@
-const argon2 = require('argon2');
-const crypto = require('node:crypto');
+const argon2 = 'argon2';
+const crypto = 'node:crypto';
 
 const DEFAULT_ARGON2_ITERATIONS = 3;
 const DEFAULT_ARGON2_PARALLELISM = 4;
@@ -18,7 +18,7 @@ async function verifyPassword(hash, password) {
     return await argon2.verify(hash, password);
 }
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
     const password = req.body.password;
     const iterations = req.body.iterations ?? DEFAULT_ARGON2_ITERATIONS;
     const parallelism = req.body.parallelism ?? DEFAULT_ARGON2_PARALLELISM;

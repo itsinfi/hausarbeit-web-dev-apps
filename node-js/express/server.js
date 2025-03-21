@@ -1,36 +1,36 @@
-const express = require('express');
-const checkConnection = require('./api/01/check-connection');
-const staticContent = require('./api/02/static-content');
-const addition = require('./api/03/addition');
-const multiplication = require('./api/04/multiplication');
-const division = require('./api/05/division');
-const powers = require('./api/06/powers');
-const logarithms = require('./api/07/logarithms');
-const primeNumbers = require('./api/08/prime-numbers');
-const readJson = require('./api/09/read-json');
-const writeJson = require('./api/10/write-json');
-const sortWholeNumbers = require('./api/11/sort-whole-numbers');
-const sortRealNumbers = require('./api/12/sort-real-numbers');
-const linqStreams = require('./api/13/linq-streams');
-const argon2id = require('./api/14/argon2id');
-const staticContentMulti = require('./api/02/static-content-multi');
-const additionMulti = require('./api/03/addition-multi');
-const multiplicationMulti = require('./api/04/multiplication-multi');
-const divisionMulti = require('./api/05/division-multi');
-const powersMulti = require('./api/06/powers-multi');
-const logarithmsMulti = require('./api/07/logarithms-multi');
-const primeNumbersMulti = require('./api/08/prime-numbers-multi');
-const readJsonMulti = require('./api/09/read-json-multi');
-const writeJsonMulti = require('./api/10/write-json-multi');
-const sortWholeNumbersMulti = require('./api/11/sort-whole-numbers-multi');
-const sortRealNumbersMulti = require('./api/12/sort-real-numbers-multi');
-const linqStreamsMulti = require('./api/13/linq-streams-multi');
-const argon2idMulti = require('./api/14/argon2id-multi');
+import express, { Router, json } from 'express';
+import checkConnection from './api/01/check-connection.js';
+import staticContent from './api/02/static-content.js';
+import addition from './api/03/addition.js';
+import multiplication from './api/04/multiplication.js';
+import division from './api/05/division.js';
+import powers from './api/06/powers.js';
+import logarithms from './api/07/logarithms.js';
+import primeNumbers from './api/08/prime-numbers.js';
+import readJson from './api/09/read-json.js';
+import writeJson from './api/10/write-json.js';
+import sortWholeNumbers from './api/11/sort-whole-numbers.js';
+import sortRealNumbers from './api/12/sort-real-numbers.js';
+import linqStreams from './api/13/linq-streams.js';
+import argon2id from './api/14/argon2id.js';
+import staticContentMulti from './api/02/static-content-multi.js';
+import additionMulti from './api/03/addition-multi.js';
+import multiplicationMulti from './api/04/multiplication-multi.js';
+import divisionMulti from './api/05/division-multi.js';
+import powersMulti from './api/06/powers-multi.js';
+import logarithmsMulti from './api/07/logarithms-multi.js';
+import primeNumbersMulti from './api/08/prime-numbers-multi.js';
+import readJsonMulti from './api/09/read-json-multi.js';
+import writeJsonMulti from './api/10/write-json-multi.js';
+import sortWholeNumbersMulti from './api/11/sort-whole-numbers-multi.js';
+import sortRealNumbersMulti from './api/12/sort-real-numbers-multi.js';
+import linqStreamsMulti from './api/13/linq-streams-multi.js';
+import argon2idMulti from './api/14/argon2id-multi.js';
 
 const app = express();
-const router = express.Router();
+const router = Router();
 
-app.use(express.json());
+app.use(json());
 
 const routes = {
     '/01': checkConnection,

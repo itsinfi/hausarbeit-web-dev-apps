@@ -1,6 +1,6 @@
 const DEFAULT_ITERATIONS = 1000;
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
     const iterations = Number(req.body.iterations) ?? DEFAULT_ITERATIONS;
 
     let finiteCount = 0;
