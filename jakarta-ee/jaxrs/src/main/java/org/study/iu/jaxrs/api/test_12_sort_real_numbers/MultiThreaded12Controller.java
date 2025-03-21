@@ -1,4 +1,4 @@
-package org.study.iu.httpservlet.api.test_12_sort_real_numbers;
+package org.study.iu.jaxrs.api.test_12_sort_real_numbers;
 
 import java.util.Arrays;
 import java.util.List;
@@ -8,16 +8,16 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.study.iu.httpservlet.interfaces.MultiThreadingTestable;
+import org.study.iu.jaxrs.interfaces.MultiThreadingTestable;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
-import jakarta.servlet.annotation.WebServlet;
+import jakarta.ws.rs.Path;
 
-@WebServlet(value = "/api/12_multi", asyncSupported = true)
-public class MultiThreadedTest12Servlet extends SingleThreadedTest12Servlet implements MultiThreadingTestable {
+@Path("12_multi")
+public class MultiThreaded12Controller extends SingleThreadedTest12Controller implements MultiThreadingTestable {
     @Override
     protected JsonObject test(JsonObject jsonInput) {
         final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);

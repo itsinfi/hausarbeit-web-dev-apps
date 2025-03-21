@@ -15,7 +15,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("02")
-public class Test02Controller extends AbstractAsyncTestController {
+public class SingleThreadedTest02Controller extends AbstractAsyncTestController {
 
     protected static final int DEFAULT_LENGTH = 1000;
     
@@ -30,7 +30,7 @@ public class Test02Controller extends AbstractAsyncTestController {
     }
     
     @Override
-    protected JsonObject executeTest(JsonObject jsonInput) {
+    protected JsonObject test(JsonObject jsonInput) {
         final int length = jsonInput.getInt("length", DEFAULT_LENGTH);
 
         final StringBuilder stringBuilder = new StringBuilder(length);

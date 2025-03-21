@@ -18,7 +18,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("11")
-public class Test11Controller extends AbstractAsyncTestController {
+public class SingleThreadedTest11Controller extends AbstractAsyncTestController {
 
     protected static final int DEFAULT_ARRAY_SIZE = 1000;
     protected static final int DEFAULT_MIN_VALUE = 0;
@@ -34,7 +34,7 @@ public class Test11Controller extends AbstractAsyncTestController {
     }
     
     @Override
-    protected JsonObject executeTest(JsonObject jsonInput) {
+    protected JsonObject test(JsonObject jsonInput) {
         final int arraySize = jsonInput.getInt("arraySize", DEFAULT_ARRAY_SIZE);
         final int minValue = jsonInput.getInt("minValue", DEFAULT_MIN_VALUE);
         final int maxValue = jsonInput.getInt("maxValue", DEFAULT_MAX_VALUE);

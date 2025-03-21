@@ -1,12 +1,13 @@
-package org.study.iu.httpservlet.api.test_09_read_json;
+package org.study.iu.jaxrs.api.test_13_linq_streams;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
-import org.study.iu.httpservlet.interfaces.MultiThreadingTestable;
+import org.study.iu.jaxrs.interfaces.MultiThreadingTestable;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -14,10 +15,10 @@ import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonNumber;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
-import jakarta.servlet.annotation.WebServlet;
+import jakarta.ws.rs.Path;
 
-@WebServlet(value = "/api/09_multi", asyncSupported = true)
-public class MultiThreadedTest09Servlet extends SingleThreadedTest09Servlet implements MultiThreadingTestable {
+@Path("13_multi")
+public class MultiThreaded13Controller extends SingleThreadedTest13Controller implements MultiThreadingTestable {
 
     private final static int DEFAULT_PARALLELIZATION_THRESHOLD = 3;
     private final static int DEFAULT_NESTING_PARALLELIZATION_LIMIT = 3;
@@ -37,33 +38,23 @@ public class MultiThreadedTest09Servlet extends SingleThreadedTest09Servlet impl
 
                     CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).join();
                 } else {
-                    jsonObject.values().forEach(value -> this.flattenJson(value, numbers, executor, depth,
-                            parallelizationThreshold, nestingParallelizationLimit));
+                    for (JsonValue value : jsonObject.values()) {
+                        flattenJson(value, numbers, executor, depth,
+                                parallelizationThreshold, nestingParallelizationLimit);
+                    }
                 }
             }
 
             case ARRAY -> {
                 final JsonArray jsonArray = json.asJsonArray();
                 
-                if (depth <= DEFAULT_NESTING_PARALLELIZATION_LIMIT && jsonArray.size() >= DEFAULT_PARALLELIZATION_THRESHOLD) {
-                    List<CompletableFuture<Void>> futures = new ArrayList<>();
-                    for (JsonValue element : jsonArray) {
-                        futures.add(CompletableFuture.runAsync(() -> 
-                                flattenJson(element, numbers, executor, depth,
-                                        parallelizationThreshold, nestingParallelizationLimit), executor));
-                    }
-
-                    CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).join();
-                } else {
-                    jsonArray.forEach(element -> flattenJson(element, numbers, executor, depth,
-                            parallelizationThreshold, nestingParallelizationLimit));
+                double sum = 0.0;
+                for (JsonValue element : jsonArray) {
+                    sum += ((JsonNumber) element).doubleValue();
                 }
-            }
 
-            case NUMBER -> {
-                synchronized (this) {
-                    numbers.add(((JsonNumber) json).doubleValue());
-                }
+                double avg = sum / jsonArray.size();
+                numbers.add(avg);
             }
 
             default -> {}
@@ -86,6 +77,8 @@ public class MultiThreadedTest09Servlet extends SingleThreadedTest09Servlet impl
 
         flattenJson(jsonInput, numbers, executor, 0, parallelizationThreshold, nestingParallelizationLimit);
 
+        Collections.sort(numbers, Comparator.naturalOrder());
+        
         final JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
 
         for (Double number : numbers) {

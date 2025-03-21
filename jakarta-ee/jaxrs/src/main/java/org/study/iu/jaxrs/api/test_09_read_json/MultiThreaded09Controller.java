@@ -1,4 +1,4 @@
-package org.study.iu.httpservlet.api.test_09_read_json;
+package org.study.iu.jaxrs.api.test_09_read_json;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
-import org.study.iu.httpservlet.interfaces.MultiThreadingTestable;
+import org.study.iu.jaxrs.interfaces.MultiThreadingTestable;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -14,11 +14,10 @@ import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonNumber;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
-import jakarta.servlet.annotation.WebServlet;
+import jakarta.ws.rs.Path;
 
-@WebServlet(value = "/api/09_multi", asyncSupported = true)
-public class MultiThreadedTest09Servlet extends SingleThreadedTest09Servlet implements MultiThreadingTestable {
-
+@Path("09_multi")
+public class MultiThreaded09Controller extends SingleThreadedTest09Controller implements MultiThreadingTestable {
     private final static int DEFAULT_PARALLELIZATION_THRESHOLD = 3;
     private final static int DEFAULT_NESTING_PARALLELIZATION_LIMIT = 3;
 

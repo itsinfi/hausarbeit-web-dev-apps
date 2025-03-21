@@ -63,7 +63,7 @@ public class MultiThreadedTest11Servlet extends SingleThreadedTest11Servlet impl
                 })
                 .join();
         
-        Arrays.parallelSort(array);
+        Arrays.sort(array);
 
         final JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
 

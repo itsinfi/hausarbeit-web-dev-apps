@@ -14,7 +14,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("01")
-public class Test01Controller extends AbstractAsyncTestController {
+public class SingleThreadedTest01Controller extends AbstractAsyncTestController {
 
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
@@ -24,7 +24,7 @@ public class Test01Controller extends AbstractAsyncTestController {
     }
     
     @Override
-    protected JsonObject executeTest(JsonObject jsonInput) {
+    protected JsonObject test(JsonObject jsonInput) {
         final String name = jsonInput.getString("name");
 
         return Json.createObjectBuilder()

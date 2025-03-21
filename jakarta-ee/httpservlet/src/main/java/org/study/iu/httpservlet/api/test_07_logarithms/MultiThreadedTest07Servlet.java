@@ -37,14 +37,14 @@ public class MultiThreadedTest07Servlet extends SingleThreadedTest07Servlet impl
                 threadIterations += iterations % threads;
             }
 
-            double threadFiniteCount = Double.MAX_VALUE;
+            double threadFiniteCount = 0;
 
             for (int i = 0; i < threadIterations; i++) {
                 ThreadLocalRandom RANDOM = ThreadLocalRandom.current();
 
                 final double randomRealNumber = RANDOM.nextDouble() < 0.5
-                        ? RANDOM.nextDouble() * 1.0e-100
-                        : RANDOM.nextDouble() * 1.0e100;
+                        ? RANDOM.nextDouble() * Double.MAX_VALUE * Double.MAX_VALUE
+                        : RANDOM.nextDouble() * Double.MAX_VALUE;
 
                 final double result = Math.log(randomRealNumber);
 

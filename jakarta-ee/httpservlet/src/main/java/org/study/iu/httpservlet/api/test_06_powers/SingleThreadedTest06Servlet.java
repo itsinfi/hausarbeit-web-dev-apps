@@ -27,7 +27,7 @@ public class SingleThreadedTest06Servlet extends AbstractAsyncTestServlet {
 
         for (int i = 0; i < iterations; i++) {
             final double randomRealNumber = RANDOM.nextDouble(lowerBound, upperBound);
-            sum += Math.pow(Math.E, randomRealNumber);
+            sum += Math.exp(randomRealNumber);
         }
 
         return Json.createObjectBuilder()

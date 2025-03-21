@@ -21,7 +21,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("13")
-public class Test13Controller extends AbstractAsyncTestController {
+public class SingleThreadedTest13Controller extends AbstractAsyncTestController {
 
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
@@ -34,9 +34,7 @@ public class Test13Controller extends AbstractAsyncTestController {
         switch (json.getValueType()) {
             case OBJECT -> {
                 final JsonObject jsonObject = json.asJsonObject();
-                for (String key : jsonObject.keySet()) {
-                    this.flattenJson(jsonObject.get(key), numbers);
-                }
+                jsonObject.values().forEach(value -> this.flattenJson(value, numbers));
             }
 
             case ARRAY -> {
@@ -55,7 +53,7 @@ public class Test13Controller extends AbstractAsyncTestController {
     }
     
     @Override
-    protected JsonObject executeTest(JsonObject jsonInput) {
+    protected JsonObject test(JsonObject jsonInput) {
         final ArrayList<Double> numbers = new ArrayList<>();
 
         this.flattenJson(jsonInput, numbers);

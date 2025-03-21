@@ -1,4 +1,4 @@
-package org.study.iu.httpservlet.api.test_08_prime_numbers;
+package org.study.iu.jaxrs.api.test_08_prime_numbers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,16 +8,16 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 
-import org.study.iu.httpservlet.interfaces.MultiThreadingTestable;
+import org.study.iu.jaxrs.interfaces.MultiThreadingTestable;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
-import jakarta.servlet.annotation.WebServlet;
+import jakarta.ws.rs.Path;
 
-@WebServlet(value = "/api/08_multi", asyncSupported = true)
-public class MultiThreadedTest08Servlet extends SingleThreadedTest08Servlet implements MultiThreadingTestable {
+@Path("08_multi")
+public class MultiThreaded08Controller extends SingleThreadedTest08Controller implements MultiThreadingTestable {
     @Override
     protected JsonObject test(JsonObject jsonInput) {
         final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);

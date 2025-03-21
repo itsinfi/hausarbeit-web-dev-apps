@@ -1,4 +1,4 @@
-package org.study.iu.httpservlet.api.test_06_powers;
+package org.study.iu.jaxrs.api.test_06_powers;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -9,14 +9,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.study.iu.httpservlet.interfaces.MultiThreadingTestable;
+import org.study.iu.jaxrs.interfaces.MultiThreadingTestable;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
-import jakarta.servlet.annotation.WebServlet;
+import jakarta.ws.rs.Path;
 
-@WebServlet(value = "/api/06_multi", asyncSupported = true)
-public class MultiThreadedTest06Servlet extends SingleThreadedTest06Servlet implements MultiThreadingTestable {
+@Path("06_multi")
+public class MultiThreaded06Controller extends SingleThreadedTest06Controller implements MultiThreadingTestable {
     @Override
     protected JsonObject test(JsonObject jsonInput) {
         final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);

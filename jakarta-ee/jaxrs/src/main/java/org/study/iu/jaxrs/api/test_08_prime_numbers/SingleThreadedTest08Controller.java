@@ -18,7 +18,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("08")
-public class Test08Controller extends AbstractAsyncTestController {
+public class SingleThreadedTest08Controller extends AbstractAsyncTestController {
 
     protected static final int DEFAULT_AMOUNT = 1000;
 
@@ -30,7 +30,7 @@ public class Test08Controller extends AbstractAsyncTestController {
     }
     
     @Override
-    protected JsonObject executeTest(JsonObject jsonInput) {
+    protected JsonObject test(JsonObject jsonInput) {
         final int amount = jsonInput.getInt("amount", DEFAULT_AMOUNT);
         
         ArrayList<Integer> primes = new ArrayList<>();

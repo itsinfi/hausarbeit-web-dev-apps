@@ -1,4 +1,4 @@
-package org.study.iu.httpservlet.api.test_12_sort_real_numbers;
+package org.study.iu.jaxrs.api.test_11_sort_whole_numbers;
 
 import java.util.Arrays;
 import java.util.List;
@@ -8,16 +8,16 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.study.iu.httpservlet.interfaces.MultiThreadingTestable;
+import org.study.iu.jaxrs.interfaces.MultiThreadingTestable;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
-import jakarta.servlet.annotation.WebServlet;
+import jakarta.ws.rs.Path;
 
-@WebServlet(value = "/api/12_multi", asyncSupported = true)
-public class MultiThreadedTest12Servlet extends SingleThreadedTest12Servlet implements MultiThreadingTestable {
+@Path("11_multi")
+public class MultiThreaded11Controller extends SingleThreadedTest11Controller implements MultiThreadingTestable {
     @Override
     protected JsonObject test(JsonObject jsonInput) {
         final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
@@ -31,30 +31,30 @@ public class MultiThreadedTest12Servlet extends SingleThreadedTest12Servlet impl
         final int minValue = jsonInput.getInt("minValue", DEFAULT_MIN_VALUE);
         final int maxValue = jsonInput.getInt("maxValue", DEFAULT_MAX_VALUE);
 
-        final List<CompletableFuture<double[]>> futures = IntStream
+        final List<CompletableFuture<int[]>> futures = IntStream
                 .range(0, threads)
                 .mapToObj(t -> CompletableFuture.supplyAsync(() -> {
                     final int threadArraySize = arraySize / threads + (t < arraySize % threads ? 1 : 0);
 
-                    final double[] threadArray = new double[threadArraySize];
+                    final int[] threadArray = new int[threadArraySize];
 
                     final ThreadLocalRandom random = ThreadLocalRandom.current();
 
                     for (int i = 0; i < threadArraySize; i++) {
-                        threadArray[i] = random.nextDouble(minValue, maxValue + 1);
+                        threadArray[i] = random.nextInt(minValue, maxValue + 1);
                     }
 
                     return threadArray;
                 }, executor))
                 .collect(Collectors.toList());
 
-        final double[] array = CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new))
+        final int[] array = CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new))
                 .thenApply(v -> {
-                    final double[] result = new double[arraySize];
+                    final int[] result = new int[arraySize];
                     int index = 0;
 
-                    for (final CompletableFuture<double[]> future : futures) {
-                        final double[] threadArray = future.join();
+                    for (final CompletableFuture<int[]> future : futures) {
+                        final int[] threadArray = future.join();
                         System.arraycopy(threadArray, 0, result, index, threadArray.length);
                         index += threadArray.length;
                     }

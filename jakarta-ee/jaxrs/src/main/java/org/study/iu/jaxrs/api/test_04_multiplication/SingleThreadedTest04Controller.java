@@ -1,4 +1,4 @@
-package org.study.iu.jaxrs.api.test_07_logarithms;
+package org.study.iu.jaxrs.api.test_04_multiplication;
 
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
@@ -14,10 +14,12 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@Path("07")
-public class Test07Controller extends AbstractAsyncTestController {
+@Path("04")
+public class SingleThreadedTest04Controller extends AbstractAsyncTestController {
     
     protected static final int DEFAULT_ITERATIONS = 1000;
+    protected static final int DEFAULT_LOWER_BOUND = 1;
+    protected static final int DEFAULT_UPPER_BOUND = 2;
     
     protected static final Random RANDOM = new Random();
 
@@ -29,26 +31,23 @@ public class Test07Controller extends AbstractAsyncTestController {
     }
     
     @Override
-    protected JsonObject executeTest(JsonObject jsonInput) {
+    protected JsonObject test(JsonObject jsonInput) {
         final int iterations = jsonInput.getInt("iterations", DEFAULT_ITERATIONS);
+        final int lowerBound = jsonInput.getInt("lowerBound", DEFAULT_LOWER_BOUND);
+        final int upperBound = jsonInput.getInt("upperBound", DEFAULT_UPPER_BOUND);
         
-        int finiteCount = 0;
+        double product = 1.0;
 
         for (int i = 0; i < iterations; i++) {
-            final double randomRealNumber = RANDOM.nextDouble() < 0.5
-                    ? RANDOM.nextDouble() * 1.0e-100
-                    : RANDOM.nextDouble() * 1.0e100;
-
-            final double result = Math.log(randomRealNumber);
-
-            if (Double.isFinite(result)) {
-                finiteCount++;
-            }
+            final double randomRealNumber = RANDOM.nextDouble(lowerBound, upperBound);
+            product *= randomRealNumber;
         }
 
         return Json.createObjectBuilder()
                 .add("iterations", iterations)
-                .add("result", finiteCount)
+                .add("lowerBound", lowerBound)
+                .add("upperBound", upperBound)
+                .add("result", product)
                 .build();
     }
 }

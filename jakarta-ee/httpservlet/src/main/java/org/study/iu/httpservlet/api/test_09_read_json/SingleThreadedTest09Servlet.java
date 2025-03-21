@@ -20,16 +20,12 @@ public class SingleThreadedTest09Servlet extends AbstractAsyncTestServlet {
         switch (json.getValueType()) {
             case OBJECT -> {
                 final JsonObject jsonObject = json.asJsonObject();
-                for (JsonValue value : jsonObject.values()) {
-                    this.flattenJson(value, numbers);
-                }
+                jsonObject.values().forEach(value -> this.flattenJson(value, numbers));
             }
 
             case ARRAY -> {
                 final JsonArray jsonArray = json.asJsonArray();
-                for (JsonValue element : jsonArray) {
-                    this.flattenJson(element, numbers);
-                }
+                jsonArray.forEach(element -> this.flattenJson(element, numbers));
             }
 
             case NUMBER -> {

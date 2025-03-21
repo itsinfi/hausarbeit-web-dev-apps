@@ -18,7 +18,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("10")
-public class Test10Controller extends AbstractAsyncTestController {
+public class SingleThreadedTest10Controller extends AbstractAsyncTestController {
 
     protected static final int DEFAULT_DEPTH = 3;
     protected static final int DEFAULT_OBJECTS_PER_LEVEL = 4;
@@ -61,7 +61,7 @@ public class Test10Controller extends AbstractAsyncTestController {
     }
     
     @Override
-    protected JsonObject executeTest(JsonObject jsonInput) {
+    protected JsonObject test(JsonObject jsonInput) {
         final int depth = jsonInput.getInt("depth", DEFAULT_DEPTH);
         final int objectsPerLevel = jsonInput.getInt("objectsPerLevel", DEFAULT_OBJECTS_PER_LEVEL);
         final int arraySize = jsonInput.getInt("arraySize", DEFAULT_ARRAY_SIZE);

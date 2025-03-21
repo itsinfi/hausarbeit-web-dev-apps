@@ -1,4 +1,4 @@
-package org.study.iu.httpservlet.api.test_06_powers;
+package org.study.iu.jaxrs.api.test_04_multiplication;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -9,14 +9,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.study.iu.httpservlet.interfaces.MultiThreadingTestable;
+import org.study.iu.jaxrs.interfaces.MultiThreadingTestable;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
-import jakarta.servlet.annotation.WebServlet;
+import jakarta.ws.rs.Path;
 
-@WebServlet(value = "/api/06_multi", asyncSupported = true)
-public class MultiThreadedTest06Servlet extends SingleThreadedTest06Servlet implements MultiThreadingTestable {
+@Path("04_multi")
+public class MultiThreaded04Controller extends SingleThreadedTest04Controller implements MultiThreadingTestable {
     @Override
     protected JsonObject test(JsonObject jsonInput) {
         final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
@@ -30,7 +30,7 @@ public class MultiThreadedTest06Servlet extends SingleThreadedTest06Servlet impl
         final int lowerBound = jsonInput.getInt("lowerBound", DEFAULT_LOWER_BOUND);
         final int upperBound = jsonInput.getInt("upperBound", DEFAULT_UPPER_BOUND);
         
-        double sum = 0.0;
+        double product = 1.0;
 
         final Function<Integer, Double> task = (Integer a) -> {
             int threadIterations = iterations / threads;
@@ -39,14 +39,14 @@ public class MultiThreadedTest06Servlet extends SingleThreadedTest06Servlet impl
                 threadIterations += iterations % threads;
             }
 
-            double threadSum = 0;
+            double threadProduct = 1.0;
 
             for (int i = 0; i < threadIterations; i++) {
                 final double randomRealNumber = ThreadLocalRandom.current().nextDouble(lowerBound, upperBound);
-                threadSum += Math.exp(randomRealNumber);
+                threadProduct *= randomRealNumber;
             }
 
-            return threadSum;
+            return threadProduct;
         };
 
         final List<CompletableFuture<Double>> futures = IntStream
@@ -61,7 +61,7 @@ public class MultiThreadedTest06Servlet extends SingleThreadedTest06Servlet impl
 
         for (CompletableFuture<Double> future : futures) {
             try {
-                sum += future.get();
+                product *= future.get();
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
@@ -73,7 +73,7 @@ public class MultiThreadedTest06Servlet extends SingleThreadedTest06Servlet impl
                 .add("iterations", iterations)
                 .add("lowerBound", lowerBound)
                 .add("upperBound", upperBound)
-                .add("result", sum)
+                .add("result", product)
                 .build();
     }
 }

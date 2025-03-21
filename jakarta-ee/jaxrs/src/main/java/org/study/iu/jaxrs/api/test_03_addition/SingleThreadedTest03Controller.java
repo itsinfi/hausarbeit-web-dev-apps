@@ -1,4 +1,4 @@
-package org.study.iu.jaxrs.api.test_05_division;
+package org.study.iu.jaxrs.api.test_03_addition;
 
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
@@ -14,12 +14,12 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@Path("05")
-public class Test05Controller extends AbstractAsyncTestController {
+@Path("03")
+public class SingleThreadedTest03Controller extends AbstractAsyncTestController {
     
     protected static final int DEFAULT_ITERATIONS = 1000;
-    protected static final int DEFAULT_LOWER_BOUND = 1;
-    protected static final int DEFAULT_UPPER_BOUND = 2;
+    protected static final int DEFAULT_LOWER_BOUND = 0;
+    protected static final int DEFAULT_UPPER_BOUND = 1;
     
     protected static final Random RANDOM = new Random();
 
@@ -31,23 +31,23 @@ public class Test05Controller extends AbstractAsyncTestController {
     }
     
     @Override
-    protected JsonObject executeTest(JsonObject jsonInput) {
+    protected JsonObject test(JsonObject jsonInput) {
         final int iterations = jsonInput.getInt("iterations", DEFAULT_ITERATIONS);
         final int lowerBound = jsonInput.getInt("lowerBound", DEFAULT_LOWER_BOUND);
         final int upperBound = jsonInput.getInt("upperBound", DEFAULT_UPPER_BOUND);
         
-        double quotient = Double.MAX_VALUE;
+        double sum = 0.0;
 
         for (int i = 0; i < iterations; i++) {
             final double randomRealNumber = RANDOM.nextDouble(lowerBound, upperBound);
-            quotient /= randomRealNumber;
+            sum += randomRealNumber;
         }
 
         return Json.createObjectBuilder()
                 .add("iterations", iterations)
                 .add("lowerBound", lowerBound)
                 .add("upperBound", upperBound)
-                .add("result", quotient)
+                .add("result", sum)
                 .build();
     }
 }
