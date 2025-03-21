@@ -59,9 +59,7 @@ public class MultiThreadedTest07Servlet extends SingleThreadedTest07Servlet impl
         final List<CompletableFuture<Double>> futures = IntStream
                 .range(0, threads)
                 .mapToObj(a -> CompletableFuture
-                        .supplyAsync(() -> {
-                            return task.apply(a);
-                        }, executor))
+                        .supplyAsync(() -> task.apply(a), executor))
                 .collect(Collectors.toList());
 
         CompletableFuture<Void> allDone = CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
