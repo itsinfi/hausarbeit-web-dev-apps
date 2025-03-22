@@ -2,10 +2,10 @@
   "name": "express.js",
   "version": "1.0.0",
   "description": "for testing node.js express.js mongodb performance",
-  "main": "src/server.js",
+  "main": "src/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/server.js"
+    "start": "node src/main.js"
   },
   "type": "module",
   "author": "Sascha Angermann",
