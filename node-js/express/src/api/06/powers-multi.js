@@ -5,7 +5,7 @@ const DEFAULT_ITERATIONS = 1000;
 const DEFAULT_LOWER_BOUND = 1;
 const DEFAULT_UPPER_BOUND = 2;
 
-const piscina = createThreadPool('./workers/06.js');
+const piscina = createThreadPool('./src/workers/06.js');
 
 (async () => {
     await Promise.all(Array(piscina.options.minThreads)
@@ -40,9 +40,7 @@ export default async (req, res) => {
 
     const results = await Promise.all(promises);
 
-    results.forEach(r => {
-        sum += r;
-    });
+    results.forEach(r => sum += r);
 
     res.json({ 
         threads,

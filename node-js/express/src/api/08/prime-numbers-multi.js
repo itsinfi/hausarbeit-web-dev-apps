@@ -1,15 +1,28 @@
+const primeNumbers = './prime-numbers.js';
+import createThreadPool from '../../utils/create-thread-pool.js';
+
 const DEFAULT_AMOUNT = 1000;
 
+const piscina = createThreadPool('./src/workers/08.js');
+
+(async () => {
+    await Promise.all(Array(piscina.options.minThreads)
+        .fill()
+        .map(() => piscina.run({ warmup: true }))
+    );
+})();
+
 export default async (req, res) => {
+    const threads = Number(req.body.threads) ?? DEFAULT_THREADS;
     const amount = Number(req.body.amount) ?? DEFAULT_AMOUNT;
+
+    if (threads <= 1) {
+        return primeNumbers(req, res);
+    }
 
     let primes = [];
     let limit = amount;
     let iterations = 0;
-
-    if (amount <= 1) {
-        throw Error("'amount' needs to be > 1");
-    }
 
     do {
         const squareRootOfLimit = Math.sqrt(limit);
@@ -29,6 +42,19 @@ export default async (req, res) => {
             }
         }
 
+        let promises = Array.from(
+            { length: threads },
+            (_, threadIndex) => piscina.run({
+                threadIndex,
+                threads,
+                limit,
+                squareRootOfLimit,
+                sieve,
+            })
+        );
+
+        await Promise.all(promises);
+
         for (let i = 2; i <= limit; i++) {
             if (sieve[i]) {
                 primes.push(i);
@@ -42,6 +68,7 @@ export default async (req, res) => {
     const result = primes.slice(0, amount);
 
     res.json({
+        threads,
         iterations,
         found: result.length,
         result,

@@ -1,11 +1,11 @@
-const addition = './addition.js';
+const division = './division.js';
 import createThreadPool from '../../utils/create-thread-pool.js';
 
 const DEFAULT_ITERATIONS = 1000;
-const DEFAULT_LOWER_BOUND = 0;
-const DEFAULT_UPPER_BOUND = 1;
+const DEFAULT_LOWER_BOUND = 1;
+const DEFAULT_UPPER_BOUND = 2;
 
-const piscina = createThreadPool('./workers/03.js');
+const piscina = createThreadPool('./src/workers/05.js');
 
 (async () => {
     await Promise.all(Array(piscina.options.minThreads)
@@ -20,11 +20,7 @@ export default async (req, res) => {
     const lowerBound = Number(req.body.lowerBound) ?? DEFAULT_LOWER_BOUND;
     const upperBound = Number(req.body.upperBound) ?? DEFAULT_UPPER_BOUND;
 
-    if (threads <= 1) {
-        return addition(req, res);
-    }
-
-    let sum = 0;
+    let quotient = Number.MAX_VALUE;
 
     let promises = [];
 
@@ -40,15 +36,15 @@ export default async (req, res) => {
 
     const results = await Promise.all(promises);
 
-    results.forEach(r => {
-        sum += r;
-    });
+    results
+        .sort((a, b) => a.thread > b.thread)
+        .forEach(r => quotient /= r.quotient);
 
     res.json({ 
         threads,
         iterations,
         lowerBound,
         upperBound,
-        result: sum,
+        result: quotient,
     });
 }

@@ -7,10 +7,6 @@ export default async (req, res) => {
     let limit = amount;
     let iterations = 0;
 
-    if (amount <= 1) {
-        throw Error("'amount' needs to be > 1");
-    }
-
     do {
         const squareRootOfLimit = Math.sqrt(limit);
 

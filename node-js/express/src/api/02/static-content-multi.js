@@ -4,7 +4,7 @@ import createThreadPool from '../../utils/create-thread-pool.js';
 const DEFAULT_THREADS = 1;
 const DEFAULT_LENGTH = 1000;
 
-const piscina = createThreadPool('./workers/02.js');
+const piscina = createThreadPool('./src/workers/02.js');
 
 (async () => {
     await Promise.all(Array(piscina.options.minThreads)

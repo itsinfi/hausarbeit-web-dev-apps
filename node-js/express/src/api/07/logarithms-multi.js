@@ -1,11 +1,9 @@
-const multiplication = './multiplication.js';
+const logarithms = './logarithms.js';
 import createThreadPool from '../../utils/create-thread-pool.js';
 
 const DEFAULT_ITERATIONS = 1000;
-const DEFAULT_LOWER_BOUND = 1;
-const DEFAULT_UPPER_BOUND = 2;
 
-const piscina = createThreadPool('./workers/04.js');
+const piscina = createThreadPool('./src/workers/07.js');
 
 (async () => {
     await Promise.all(Array(piscina.options.minThreads)
@@ -17,14 +15,8 @@ const piscina = createThreadPool('./workers/04.js');
 export default async (req, res) => {
     const threads = Number(req.body.threads) ?? DEFAULT_THREADS;
     const iterations = Number(req.body.iterations) ?? DEFAULT_ITERATIONS;
-    const lowerBound = Number(req.body.lowerBound) ?? DEFAULT_LOWER_BOUND;
-    const upperBound = Number(req.body.upperBound) ?? DEFAULT_UPPER_BOUND;
 
-    if (threads <= 1) {
-        return addition(req, res);
-    }
-
-    let product = 1;
+    let finiteCount = 0;
 
     let promises = [];
 
@@ -33,22 +25,16 @@ export default async (req, res) => {
             thread: i,
             threads,
             iterations,
-            upperBound,
-            lowerBound,
         }));
     }
 
     const results = await Promise.all(promises);
 
-    results.forEach(r => {
-        product *= r;
-    });
+    results.forEach(r => finiteCount += r);
 
     res.json({ 
         threads,
         iterations,
-        lowerBound,
-        upperBound,
-        result: product,
+        result: finiteCount,
     });
 }

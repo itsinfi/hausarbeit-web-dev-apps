@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 
 import org.study.iu.jaxrs.interfaces.MultiThreadingTestable;
@@ -35,70 +34,51 @@ public class MultiThreaded08Controller extends SingleThreadedTest08Controller im
 
         do {
             final int currentLimit = limit;
-            final int squareRootOfLimit = (int) Math.sqrt(currentLimit);
+            final double squareRootOfLimit = Math.sqrt(currentLimit);
 
             primes.clear();
             
-            boolean[] sieve = new boolean[squareRootOfLimit + 1];
+            boolean[] sieve = new boolean[currentLimit + 1];
             Arrays.fill(sieve, true);
             sieve[0] = sieve[1] = false;
 
             for (int i = 2; i <= squareRootOfLimit; i++) {
                 if (sieve[i]) {
-                    for (int j = i * i; j <= squareRootOfLimit; j += i) {
+                    for (int j = i * i; j <= currentLimit; j += i) {
                         sieve[j] = false;
                     }
                 }
             }
 
-            for (int i = 2; i <= squareRootOfLimit; i++) {
-                if (sieve[i]) {
-                    primes.add(i);
-                }
-            }
-
-            List<CompletableFuture<List<Integer>>> futures = new ArrayList<>(threads);
+            List<CompletableFuture<Void>> futures = new ArrayList<>(threads);
 
             for (int t = 0; t < threads; t++) {
                 final int threadIndex = t;
                 futures.add(
-                    CompletableFuture.supplyAsync(() -> {
-                        int start = squareRootOfLimit + 1 + threadIndex * ((currentLimit - squareRootOfLimit) / threads);
-                        int end = (threadIndex == threads - 1) ? currentLimit : start + ((currentLimit - squareRootOfLimit) / threads);
+                    CompletableFuture.runAsync(() -> {
+                            int start = (int) squareRootOfLimit + 1 + threadIndex * ((currentLimit - (int) squareRootOfLimit) / threads);
+                            int end = (threadIndex == threads - 1) ? currentLimit : start + ((currentLimit - (int) squareRootOfLimit) / threads);
 
-                        boolean[] segmentSieve = new boolean[end - start + 1];
-                        Arrays.fill(segmentSieve, true);
-
-                        for (int prime : primes) {
-                            int firstMultiple = Math.max(prime * prime, (start + prime - 1) / prime * prime);
-                            for (int j = firstMultiple; j <= end; j += prime) {
-                                segmentSieve[j - start] = false;
+                            for (int i = 2; i <= squareRootOfLimit; i++) {
+                                if (sieve[i]) {
+                                    int firstMultiple = Math.max(i + i, (start + i - 1) / i * i);
+                                    
+                                    for (int j = firstMultiple; j <= end; j += i) {
+                                        sieve[j] = false;
+                                    }
+                                }
                             }
-                        }
-
-                        List<Integer> threadPrimes = new ArrayList<>();
-                        for (int i = 0; i < segmentSieve.length; i++) {
-                            if (segmentSieve[i]) {
-                                threadPrimes.add(start + i);
-                            }
-                        }
-
-                        return threadPrimes;
                     }, executor)
                 );
             }
 
             CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).join();
 
-            for (CompletableFuture<List<Integer>> future : futures) {
-                try {
-                    primes.addAll(future.get());
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
+            for (int i = 2; i <= currentLimit; i++) {
+                if (sieve[i]) {
+                    primes.add(i);
                 }
             }
-
-            primes.addAll(0, primes);
 
             limit *= 2;
             iterations++;
