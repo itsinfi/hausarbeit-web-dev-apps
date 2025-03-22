@@ -1,4 +1,8 @@
-export default ({ thread, threads, iterations }) => {
+export default ({ warmup, thread, threads, iterations }) => {
+    if (warmup) {
+        return;
+    }
+    
     let threadIterations = Math.floor(iterations / threads);
 
     if (thread == threads - 1) {

@@ -44,7 +44,7 @@ public class MultiThreaded09Controller extends SingleThreadedTest09Controller im
             case ARRAY -> {
                 final JsonArray jsonArray = json.asJsonArray();
                 
-                if (depth <= DEFAULT_NESTING_PARALLELIZATION_LIMIT && jsonArray.size() >= DEFAULT_PARALLELIZATION_THRESHOLD) {
+                if (depth <= nestingParallelizationLimit && jsonArray.size() >= parallelizationThreshold) {
                     List<CompletableFuture<Void>> futures = new ArrayList<>();
                     for (JsonValue element : jsonArray) {
                         futures.add(CompletableFuture.runAsync(() -> 

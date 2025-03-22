@@ -3,18 +3,18 @@ import createThreadPool from '../../utils/create-thread-pool.js';
 
 const DEFAULT_AMOUNT = 1000;
 
-const piscina = createThreadPool('./src/workers/08.js');
+const threadPool = createThreadPool('./src/workers/08.js');
 
 (async () => {
-    await Promise.all(Array(piscina.options.minThreads)
+    await Promise.all(Array(threadPool.options.minThreads)
         .fill()
-        .map(() => piscina.run({ warmup: true }))
+        .map(() => threadPool.run({ warmup: true }))
     );
 })();
 
 export default async (req, res) => {
-    const threads = Number(req.body.threads) ?? DEFAULT_THREADS;
-    const amount = Number(req.body.amount) ?? DEFAULT_AMOUNT;
+    const threads = Number(req.body.threads ?? DEFAULT_THREADS);
+    const amount = Number(req.body.amount ?? DEFAULT_AMOUNT);
 
     if (threads <= 1) {
         return primeNumbers(req, res);
@@ -44,7 +44,7 @@ export default async (req, res) => {
 
         let promises = Array.from(
             { length: threads },
-            (_, threadIndex) => piscina.run({
+            (_, threadIndex) => threadPool.run({
                 threadIndex,
                 threads,
                 limit,

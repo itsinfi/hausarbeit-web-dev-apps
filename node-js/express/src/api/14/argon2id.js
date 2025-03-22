@@ -19,11 +19,11 @@ async function verifyPassword(hash, password) {
 }
 
 export default async (req, res) => {
-    const password = req.body.password;
-    const iterations = req.body.iterations ?? DEFAULT_ARGON2_ITERATIONS;
-    const parallelism = req.body.parallelism ?? DEFAULT_ARGON2_PARALLELISM;
-    const memoryInKb = req.body.memoryInKb ?? DEFAULT_ARGON2_MEMORY_IN_KB;
-    const saltSize = req.body.saltSize ?? DEFAULT_SALT_SIZE;
+    const password = String(req.body.password ?? '');
+    const iterations = Number(req.body.iterations ?? DEFAULT_ARGON2_ITERATIONS);
+    const parallelism = Number(req.body.parallelism ?? DEFAULT_ARGON2_PARALLELISM);
+    const memoryInKb = Number(req.body.memoryInKb ?? DEFAULT_ARGON2_MEMORY_IN_KB);
+    const saltSize = Number(req.body.saltSize ?? DEFAULT_SALT_SIZE);
 
     if (!password) {
         return;

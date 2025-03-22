@@ -1,6 +1,10 @@
 const CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-export default ({ thread, threads, length }) => {
+export default ({ warmup, thread, threads, length }) => {
+    if (warmup) {
+        return;
+    }
+
     let threadLength = Math.floor(length / threads);
     
     if (thread == threads - 1) {

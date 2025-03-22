@@ -1,25 +1,32 @@
-function flattenJson(json, numbers) {
-    if (Array.isArray(json)) {
-        let sum = 0;
-        json.forEach(element => {
-            sum += Number(element);
-        });
-        const avg = sum / json.length;
-        numbers.push(avg);
-    } else if (json !== null && typeof json === 'object') {
-        Object.keys(json).forEach(key => flattenJson(json[key], numbers));
-    }
-}
+import flattenJsonMulti from '../../utils/13/flatten-json-multi.js';
+import createThreadPool from '../../utils/create-thread-pool.js';
+
+const DEFAULT_PARALLELIZATION_THRESHOLD = 3;
+const DEFAULT_NESTING_PARALLELIZATION_LIMIT = 3;
+
+const threadPool = createThreadPool('./src/workers/13.js');
+
+(async () => {
+    await Promise.all(Array(threadPool.options.minThreads)
+        .fill()
+        .map(() => threadPool.run({ warmup: true }))
+    );
+})();
 
 export default async (req, res) => {
+    const parallelizationThreshold = Number(req.body.parallelizationThreshold ?? DEFAULT_PARALLELIZATION_THRESHOLD);
+    const nestingParallelizationLimit = Number(req.body.nestingParallelizationLimit ?? DEFAULT_NESTING_PARALLELIZATION_LIMIT);
+
     let numbers = [];
 
-    flattenJson(req.body, numbers);
+    await flattenJsonMulti(req.body, numbers, 0, parallelizationThreshold, nestingParallelizationLimit, threadPool);
 
     numbers.sort((a, b) => a - b);
 
     res.json({
-        amount: numbers.length,
+        parallelizationThreshold,
+        nestingParallelizationLimit,
+        found: numbers.length,
         result: numbers,
     });
 }

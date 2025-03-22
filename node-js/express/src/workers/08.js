@@ -1,4 +1,8 @@
-export default ({ threadIndex, threads, limit, squareRootOfLimit, sieve }) => {
+export default ({ warmup, threadIndex, threads, limit, squareRootOfLimit, sieve }) => {
+    if (warmup) {
+        return;
+    }
+    
     let start = Math.floor(squareRootOfLimit + 1 + threadIndex * ((limit - squareRootOfLimit) / threads));
     let end = Math.floor((threadIndex == threads - 1) ? limit : start + ((limit - squareRootOfLimit) / threads));
 

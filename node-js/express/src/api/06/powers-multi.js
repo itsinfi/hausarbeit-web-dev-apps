@@ -5,20 +5,20 @@ const DEFAULT_ITERATIONS = 1000;
 const DEFAULT_LOWER_BOUND = 1;
 const DEFAULT_UPPER_BOUND = 2;
 
-const piscina = createThreadPool('./src/workers/06.js');
+const threadPool = createThreadPool('./src/workers/06.js');
 
 (async () => {
-    await Promise.all(Array(piscina.options.minThreads)
+    await Promise.all(Array(threadPool.options.minThreads)
         .fill()
-        .map(() => piscina.run({ warmup: true }))
+        .map(() => threadPool.run({ warmup: true }))
     );
 })();
 
 export default async (req, res) => {
-    const threads = Number(req.body.threads) ?? DEFAULT_THREADS;
-    const iterations = Number(req.body.iterations) ?? DEFAULT_ITERATIONS;
-    const lowerBound = Number(req.body.lowerBound) ?? DEFAULT_LOWER_BOUND;
-    const upperBound = Number(req.body.upperBound) ?? DEFAULT_UPPER_BOUND;
+    const threads = Number(req.body.threads ?? DEFAULT_THREADS);
+    const iterations = Number(req.body.iterations ?? DEFAULT_ITERATIONS);
+    const lowerBound = Number(req.body.lowerBound ?? DEFAULT_LOWER_BOUND);
+    const upperBound = Number(req.body.upperBound ?? DEFAULT_UPPER_BOUND);
 
     if (threads <= 1) {
         return addition(req, res);
@@ -29,7 +29,7 @@ export default async (req, res) => {
     let promises = [];
 
     for (let i = 0; i < threads; i++) {
-        promises.push(piscina.run({
+        promises.push(threadPool.run({
             thread: i,
             threads,
             iterations,

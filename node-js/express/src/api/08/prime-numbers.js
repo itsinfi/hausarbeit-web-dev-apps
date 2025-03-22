@@ -1,7 +1,7 @@
 const DEFAULT_AMOUNT = 1000;
 
 export default async (req, res) => {
-    const amount = Number(req.body.amount) ?? DEFAULT_AMOUNT;
+    const amount = Number(req.body.amount ?? DEFAULT_AMOUNT);
 
     let primes = [];
     let limit = amount;

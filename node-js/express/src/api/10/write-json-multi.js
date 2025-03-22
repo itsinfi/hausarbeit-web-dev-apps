@@ -26,11 +26,11 @@ function generateJsonArray(size, minValue, maxValue) {
 }
 
 export default async (req, res) => {
-    const depth = Number(req.body.depth) ?? DEFAULT_DEPTH;
-    const objectsPerLevel = Number(req.body.objectsPerLevel) ?? DEFAULT_OBJECTS_PER_LEVEL;
-    const arraySize = Number(req.body.arraySize) ?? DEFAULT_ARRAY_SIZE;
-    const minValue = Number(req.body.minValue) ?? DEFAULT_MIN_VALUE;
-    const maxValue = Number(req.body.maxValue) ?? DEFAULT_MAX_VALUE;
+    const depth = Number(req.body.depth ?? DEFAULT_DEPTH);
+    const objectsPerLevel = Number(req.body.objectsPerLevel ?? DEFAULT_OBJECTS_PER_LEVEL);
+    const arraySize = Number(req.body.arraySize ?? DEFAULT_ARRAY_SIZE);
+    const minValue = Number(req.body.minValue ?? DEFAULT_MIN_VALUE);
+    const maxValue = Number(req.body.maxValue ?? DEFAULT_MAX_VALUE);
 
     const result = generateJsonObject(depth, objectsPerLevel, arraySize, minValue, maxValue);
 
