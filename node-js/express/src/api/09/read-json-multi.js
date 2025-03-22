@@ -1,5 +1,6 @@
 import flattenJsonMulti from '../../utils/09/flatten-json-multi.js';
 import createThreadPool from '../../utils/create-thread-pool.js';
+import config from '../../config/config.js';
 
 const DEFAULT_PARALLELIZATION_THRESHOLD = 3;
 const DEFAULT_NESTING_PARALLELIZATION_LIMIT = 3;

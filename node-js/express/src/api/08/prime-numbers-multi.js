@@ -1,5 +1,6 @@
 const primeNumbers = './prime-numbers.js';
 import createThreadPool from '../../utils/create-thread-pool.js';
+import config from '../../config/config.js';
 
 const DEFAULT_AMOUNT = 1000;
 
@@ -13,7 +14,7 @@ const threadPool = createThreadPool('./src/workers/08.js');
 })();
 
 export default async (req, res) => {
-    const threads = Number(req.body.threads ?? DEFAULT_THREADS);
+    const threads = Number(req.body.threads ?? config.THREAD_POOL_SIZE ?? 1);
     const amount = Number(req.body.amount ?? DEFAULT_AMOUNT);
 
     if (threads <= 1) {

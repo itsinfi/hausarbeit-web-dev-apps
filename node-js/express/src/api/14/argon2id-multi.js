@@ -1,22 +1,21 @@
-const argon2 = 'argon2';
-const crypto = 'node:crypto';
+import createThreadPool from '../../utils/create-thread-pool.js';
+import config from '../../config/config.js';
+import { argon2id } from 'argon2';
 
 const DEFAULT_ARGON2_ITERATIONS = 3;
 const DEFAULT_ARGON2_PARALLELISM = 4;
 const DEFAULT_ARGON2_MEMORY_IN_KB = 65536;
 const DEFAULT_SALT_SIZE = 128;
+const DEFAULT_TASK_AMOUNT = 10;
 
-async function hashPassword(password, argon2Options, saltSize) {
-    const salt = crypto.randomBytes(saltSize);
-    return await argon2.hash(password, {
-        ...argon2Options,
-        salt,
-    });
-}
+const threadPool = createThreadPool('./src/workers/14.js');
 
-async function verifyPassword(hash, password) {
-    return await argon2.verify(hash, password);
-}
+(async () => {
+    await Promise.all(Array(threadPool.options.minThreads)
+        .fill()
+        .map(() => threadPool.run({ warmup: true }))
+    );
+})();
 
 export default async (req, res) => {
     const password = String(req.body.password ?? '');
@@ -24,22 +23,27 @@ export default async (req, res) => {
     const parallelism = Number(req.body.parallelism ?? DEFAULT_ARGON2_PARALLELISM);
     const memoryInKb = Number(req.body.memoryInKb ?? DEFAULT_ARGON2_MEMORY_IN_KB);
     const saltSize = Number(req.body.saltSize ?? DEFAULT_SALT_SIZE);
+    const taskAmount = Number(req.body.taskAmount ?? DEFAULT_TASK_AMOUNT);
 
     if (!password) {
         return;
     }
 
     const argon2Options = {
-        type: argon2.argon2id,
+        type: argon2id,
         iterations,
         parallelism,
         memoryCost: memoryInKb,
         hashLength: saltSize / 4,
     };
 
-    const hashedPassword = await hashPassword(password, argon2Options, saltSize);
+    const task = async () => {
+        const hashedPassword = await threadPool.run({ method: 'hash', data: { password, argon2Options, saltSize } });
+        const checkAuth = await threadPool.run({ method: 'verify', data: { hashedPassword, password } });
+        return { hashedPassword, checkAuth };
+    };
 
-    const checkAuth = await verifyPassword(hashedPassword, password, argon2Options, saltSize);
+    const result = await Promise.all(Array(taskAmount).fill().map(task));
 
     res.json({
         password,
@@ -47,9 +51,7 @@ export default async (req, res) => {
         parallelism,
         memoryInKb,
         saltSize,
-        result: {
-            hashedPassword,
-            checkAuth,
-        }
+        taskAmount,
+        result,
     });
 }

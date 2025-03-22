@@ -1,7 +1,7 @@
 import staticContent from './static-content.js';
 import createThreadPool from '../../utils/create-thread-pool.js';
+import config from '../../config/config.js';
 
-const DEFAULT_THREADS = 1;
 const DEFAULT_LENGTH = 1000;
 
 const threadPool = createThreadPool('./src/workers/02.js');
@@ -14,7 +14,7 @@ const threadPool = createThreadPool('./src/workers/02.js');
 })();
 
 export default async (req, res) => {
-    const threads = Number(req.body.threads ?? DEFAULT_THREADS);
+    const threads = Number(req.body.threads ?? config.THREAD_POOL_SIZE ?? 1);
     const length = Number(req.body.length ?? DEFAULT_LENGTH);
 
     if (threads <= 1) {

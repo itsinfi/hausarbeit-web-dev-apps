@@ -1,5 +1,7 @@
 import flattenJsonMulti from '../../utils/13/flatten-json-multi.js';
 import createThreadPool from '../../utils/create-thread-pool.js';
+import parallelSortArray from '../../utils/parallel-sort-array.js';
+import config from '../../config/config.js';
 
 const DEFAULT_PARALLELIZATION_THRESHOLD = 3;
 const DEFAULT_NESTING_PARALLELIZATION_LIMIT = 3;
@@ -21,12 +23,12 @@ export default async (req, res) => {
 
     await flattenJsonMulti(req.body, numbers, 0, parallelizationThreshold, nestingParallelizationLimit, threadPool);
 
-    numbers.sort((a, b) => a - b);
+    const result = await parallelSortArray(numbers, threadPool.options.minThreads);
 
     res.json({
         parallelizationThreshold,
         nestingParallelizationLimit,
-        found: numbers.length,
-        result: numbers,
+        found: result.length,
+        result: result,
     });
 }
