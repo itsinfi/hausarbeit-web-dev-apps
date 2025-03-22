@@ -1,5 +1,3 @@
-import { move } from "piscina";
-
 const CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
 export default ({ thread, threads, length }) => {

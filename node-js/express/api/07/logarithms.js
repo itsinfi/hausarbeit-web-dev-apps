@@ -7,8 +7,8 @@ export default async (req, res) => {
 
     for (let i = 0; i < iterations; i++) {
         const randomRealNumber = Math.random() < 0.5 
-            ? Math.random() * 1e-100
-            : Math.random() * 1e100;
+            ? Math.random() * Number.MAX_VALUE * Number.MAX_VALUE
+            : Math.random() * Number.MAX_VALUE;
         
         const result = Math.log(randomRealNumber);
 

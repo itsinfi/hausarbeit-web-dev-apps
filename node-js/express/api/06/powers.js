@@ -11,7 +11,7 @@ export default async (req, res) => {
 
     for (let i = 0; i < iterations; i++) {
         const randomRealNumber = Math.random() * (upperBound - lowerBound) + lowerBound;
-        sum += Math.pow(Math.E, randomRealNumber);
+        sum += Math.exp(randomRealNumber);
     }
 
     res.json({ 

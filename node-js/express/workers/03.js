@@ -1,6 +1,4 @@
-import { parentPort } from 'worker_threads';
-
-parentPort.on('message', ({ thread, threads, iterations, upperBound, lowerBound }) => {
+export default ({ thread, threads, iterations, upperBound, lowerBound }) => {
     let threadIterations = Math.floor(iterations / threads);
 
     if (thread == threads - 1) {
@@ -14,5 +12,5 @@ parentPort.on('message', ({ thread, threads, iterations, upperBound, lowerBound 
         sum += randomRealNumber;
     }
 
-    parentPort.postMessage(sum);
-});
+    return sum;
+}

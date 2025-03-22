@@ -1,9 +1,18 @@
-const { Worker } = 'worker_threads';
 const addition = './addition.js';
+import createThreadPool from '../../utils/create-thread-pool.js';
 
 const DEFAULT_ITERATIONS = 1000;
 const DEFAULT_LOWER_BOUND = 0;
 const DEFAULT_UPPER_BOUND = 1;
+
+const piscina = createThreadPool('./workers/03.js');
+
+(async () => {
+    await Promise.all(Array(piscina.options.minThreads)
+        .fill()
+        .map(() => piscina.run({ warmup: true }))
+    );
+})();
 
 export default async (req, res) => {
     const threads = Number(req.body.threads) ?? DEFAULT_THREADS;
@@ -18,13 +27,14 @@ export default async (req, res) => {
     let sum = 0;
 
     let promises = [];
-    
+
     for (let i = 0; i < threads; i++) {
-        promises.push(new Promise((resolve, reject) => {
-            const worker = new Worker('./workers/03.js');
-            worker.postMessage({ thread: i, threads, iterations, upperBound, lowerBound });
-            worker.on('message', resolve);
-            worker.on('error', reject);
+        promises.push(piscina.run({
+            thread: i,
+            threads,
+            iterations,
+            upperBound,
+            lowerBound,
         }));
     }
 
@@ -35,6 +45,7 @@ export default async (req, res) => {
     });
 
     res.json({ 
+        threads,
         iterations,
         lowerBound,
         upperBound,
