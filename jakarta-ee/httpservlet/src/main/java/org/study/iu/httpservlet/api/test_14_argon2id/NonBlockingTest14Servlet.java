@@ -28,16 +28,18 @@ public class NonBlockingTest14Servlet extends BlockingTest14Servlet implements M
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) {
+        final long startTime = System.nanoTime();
+
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
 
-        AsyncContext asyncContext = req.startAsync();
+        final AsyncContext asyncContext = req.startAsync();
 
-        ExecutorService executor = getExecutor(THREAD_MODE);
+        final ExecutorService executor = getExecutor(THREAD_MODE);
 
         CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
-                .thenApply(result -> sendResponse(res, result, asyncContext))
-                .exceptionally(ex -> handleError(ex, asyncContext));
+                .thenApply(result -> sendResponse(res, result, asyncContext, startTime))
+                .exceptionally(ex -> handleError(ex, asyncContext, startTime));
 
         return;
     }
@@ -72,7 +74,7 @@ public class NonBlockingTest14Servlet extends BlockingTest14Servlet implements M
     @Override
     protected JsonObject test(JsonObject jsonInput) {
         final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
-        ExecutorService executor = getExecutor(taskThreadMode);
+        final ExecutorService executor = getExecutor(taskThreadMode);
         if (executor == null) {
             return super.test(jsonInput);
         }

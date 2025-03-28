@@ -14,13 +14,13 @@ const threadPool = createThreadPool('./src/workers/13.js');
     );
 })();
 
-export default async (req, res) => {
-    const parallelizationThreshold = Number(req.body.parallelizationThreshold ?? DEFAULT_PARALLELIZATION_THRESHOLD);
-    const nestingParallelizationLimit = Number(req.body.nestingParallelizationLimit ?? DEFAULT_NESTING_PARALLELIZATION_LIMIT);
+export default async (request) => {
+    const parallelizationThreshold = Number(request.body.parallelizationThreshold ?? DEFAULT_PARALLELIZATION_THRESHOLD);
+    const nestingParallelizationLimit = Number(request.body.nestingParallelizationLimit ?? DEFAULT_NESTING_PARALLELIZATION_LIMIT);
 
     let numbers = [];
 
-    await flattenJsonMulti(req.body, numbers, 0, parallelizationThreshold, nestingParallelizationLimit, threadPool);
+    await flattenJsonMulti(request.body, numbers, 0, parallelizationThreshold, nestingParallelizationLimit, threadPool);
 
     const result = await parallelSortArray(numbers, threadPool.options.minThreads);
 

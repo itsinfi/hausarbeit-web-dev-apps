@@ -28,21 +28,23 @@ public class NonBlockingTest13Servlet extends BlockingTest13Servlet implements M
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) {
+        final long startTime = System.nanoTime();
+        
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
 
-        AsyncContext asyncContext = req.startAsync();
+        final AsyncContext asyncContext = req.startAsync();
 
-        ExecutorService executor = getExecutor(THREAD_MODE);
+        final ExecutorService executor = getExecutor(THREAD_MODE);
 
         CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
-                .thenApply(result -> sendResponse(res, result, asyncContext))
-                .exceptionally(ex -> handleError(ex, asyncContext));
+                .thenApply(result -> sendResponse(res, result, asyncContext, startTime))
+                .exceptionally(ex -> handleError(ex, asyncContext, startTime));
 
         return;
     }
 
-    private void flattenJson(JsonValue json, List<Double> numbers, ExecutorService executor, int depth, int parallelizationThreshold, int nestingParallelizationLimit) {
+    private void flattenJson(JsonValue json, List<Double> numbers, final ExecutorService executor, int depth, int parallelizationThreshold, int nestingParallelizationLimit) {
         switch (json.getValueType()) {
             case OBJECT -> {
                 final JsonObject jsonObject = json.asJsonObject();
@@ -87,7 +89,7 @@ public class NonBlockingTest13Servlet extends BlockingTest13Servlet implements M
         final int nestingParallelizationLimit = jsonInput.getInt("nestingParallelizationLimit",
                 DEFAULT_NESTING_PARALLELIZATION_LIMIT);
         final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
-        ExecutorService executor = getExecutor(taskThreadMode);
+        final ExecutorService executor = getExecutor(taskThreadMode);
         if (executor == null) {
             return super.test(jsonInput);
         }

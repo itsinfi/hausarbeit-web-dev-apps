@@ -40,10 +40,11 @@ public class NonBlocking14Controller extends AbstractTestController implements M
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public CompletableFuture<Response> post(JsonObject req) {
-        ExecutorService executor = getExecutor(THREAD_MODE);
+final long startTime = System.nanoTime();
+        final ExecutorService executor = getExecutor(THREAD_MODE);
         return CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
-                .thenApply(result -> sendResponse(result))
-                .exceptionally(ex -> handleError(ex));
+                .thenApply(result -> sendResponse(result, startTime))
+                .exceptionally(ex -> handleError(ex, startTime));
     }
 
     private String hashPassword(String password, int iterations, int parallelism, int memoryInKb, int saltSize) {
@@ -101,7 +102,7 @@ public class NonBlocking14Controller extends AbstractTestController implements M
     @Override
     protected JsonObject test(JsonObject jsonInput) {
         final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
-        ExecutorService executor = getExecutor(taskThreadMode);
+        final ExecutorService executor = getExecutor(taskThreadMode);
 
         final String password = jsonInput.getString("password");
         final int iterations = jsonInput.getInt("iterations", DEFAULT_ARGON2_ITERATIONS);

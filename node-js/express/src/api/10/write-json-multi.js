@@ -16,7 +16,7 @@ const threadPool = createThreadPool('./src/workers/10.js');
     );
 })();
 
-export default async (req, res) => {
+export default async (req) => {
     const depth = Number(req.body.depth ?? DEFAULT_DEPTH);
     const objectsPerLevel = Number(req.body.objectsPerLevel ?? DEFAULT_OBJECTS_PER_LEVEL);
     const arraySize = Number(req.body.arraySize ?? DEFAULT_ARRAY_SIZE);

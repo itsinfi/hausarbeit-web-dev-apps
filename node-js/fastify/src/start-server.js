@@ -44,9 +44,8 @@ export default function startServer() {
         '/11': sortWholeNumbers,
         '/12': sortRealNumbers,
         '/13': linqStreams,
-        '/14': argon2id,
     };
-
+    
     const asyncRoutes = {
         '/01_multi': checkConnection,
         '/02_multi': staticContentMulti,
@@ -61,6 +60,7 @@ export default function startServer() {
         '/11_multi': sortWholeNumbersMulti,
         '/12_multi': sortRealNumbersMulti,
         '/13_multi': linqStreamsMulti,
+        '/14': argon2id,
         '/14_multi': argon2idMulti,
     };
 
@@ -68,7 +68,7 @@ export default function startServer() {
         const startTime = process.hrtime();
 
         try {
-            const result = syncRoute(request, reply);
+            const result = syncRoute(request);
             setProcessingTimeHeader(startTime, reply);
             reply.send(result);
         } catch (err) {
@@ -80,7 +80,7 @@ export default function startServer() {
     const asyncRouteHandler = (asyncRoute) => (request, reply) => {
         const startTime = process.hrtime();
 
-        Promise.resolve(asyncRoute(request, reply))
+        Promise.resolve(asyncRoute(request))
             .then((result) => {
                 setProcessingTimeHeader(startTime, reply)
                 reply.send(result);
@@ -101,7 +101,7 @@ export default function startServer() {
 
     function setProcessingTimeHeader(startTime, reply) {
         const [seconds, nanoseconds] = process.hrtime(startTime);
-        const elapsedTimeInNanoseconds = seconds + nanoseconds / 1e9;
+        const elapsedTimeInNanoseconds = seconds + nanoseconds / 1_000_000;
         reply.header('processing-time', elapsedTimeInNanoseconds);
     }
 

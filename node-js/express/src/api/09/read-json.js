@@ -8,7 +8,7 @@ function flattenJson(json, numbers) {
     }
 }
 
-export default (req, res) => {
+export default (req) => {
     let numbers = [];
 
     flattenJson(req.body, numbers);

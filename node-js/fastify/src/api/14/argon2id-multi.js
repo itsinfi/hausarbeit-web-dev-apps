@@ -16,13 +16,13 @@ const threadPool = createThreadPool('./src/workers/14.js');
     );
 })();
 
-export default async (req, res) => {
-    const password = String(req.body.password ?? '');
-    const iterations = Number(req.body.iterations ?? DEFAULT_ARGON2_ITERATIONS);
-    const parallelism = Number(req.body.parallelism ?? DEFAULT_ARGON2_PARALLELISM);
-    const memoryInKb = Number(req.body.memoryInKb ?? DEFAULT_ARGON2_MEMORY_IN_KB);
-    const saltSize = Number(req.body.saltSize ?? DEFAULT_SALT_SIZE);
-    const taskAmount = Number(req.body.taskAmount ?? DEFAULT_TASK_AMOUNT);
+export default async (request) => {
+    const password = String(request.body.password ?? '');
+    const iterations = Number(request.body.iterations ?? DEFAULT_ARGON2_ITERATIONS);
+    const parallelism = Number(request.body.parallelism ?? DEFAULT_ARGON2_PARALLELISM);
+    const memoryInKb = Number(request.body.memoryInKb ?? DEFAULT_ARGON2_MEMORY_IN_KB);
+    const saltSize = Number(request.body.saltSize ?? DEFAULT_SALT_SIZE);
+    const taskAmount = Number(request.body.taskAmount ?? DEFAULT_TASK_AMOUNT);
 
     if (!password) {
         return;

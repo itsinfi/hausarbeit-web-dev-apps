@@ -29,6 +29,12 @@ public abstract class AbstractTestServlet extends HttpServlet {
     protected static final ExecutorService threadPoolExecutor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
     protected static final ExecutorService virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor();
 
+    private void addProcessingTimeHeader(long startTime, HttpServletResponse res) {
+        final long endTime = System.nanoTime();
+        final double duration = (endTime - startTime) / 1_000_000.0;
+        res.setHeader("processing-time", Double.toString(duration));
+    }
+
     protected JsonObject handleRoute(HttpServletRequest req) {
         // ThreadMonitor.countThreads();
         try (
@@ -43,12 +49,14 @@ public abstract class AbstractTestServlet extends HttpServlet {
         return JsonObject.EMPTY_JSON_OBJECT;
     }
     
-    protected Void sendResponse(HttpServletResponse res, JsonObject jsonOutput, AsyncContext asyncContext) {
+    protected Void sendResponse(HttpServletResponse res, JsonObject jsonOutput, final AsyncContext asyncContext, long startTime) {
         // ThreadMonitor.countThreads();
         try (final PrintWriter out = res.getWriter()) {
             out.print(jsonOutput.toString());
+            addProcessingTimeHeader(startTime, res);
             out.flush();
         } catch (Exception e) {
+            addProcessingTimeHeader(startTime, res);
             e.printStackTrace();
         } finally {
             if (asyncContext != null) {
@@ -58,7 +66,7 @@ public abstract class AbstractTestServlet extends HttpServlet {
         return null;
     }
 
-    protected Void handleError(Throwable ex, AsyncContext asyncContext) {
+    protected Void handleError(Throwable ex, final AsyncContext asyncContext, long startTime) {
         HttpServletResponse res = (HttpServletResponse) asyncContext.getResponse();
 
         ex.printStackTrace();
@@ -78,20 +86,24 @@ public abstract class AbstractTestServlet extends HttpServlet {
             if (asyncContext != null) {
                 asyncContext.complete();
             }
+
+            addProcessingTimeHeader(startTime, res);
         }
         return null;
     }
     
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) {
+        final long startTime = System.nanoTime();
+
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
         
         try {
             JsonObject result = handleRoute(req);
-            sendResponse(res, result, null);
+            sendResponse(res, result, null, startTime);
         } catch (Exception ex) {
-            handleError(ex, null);
+            handleError(ex, null, startTime);
         }
     }
     

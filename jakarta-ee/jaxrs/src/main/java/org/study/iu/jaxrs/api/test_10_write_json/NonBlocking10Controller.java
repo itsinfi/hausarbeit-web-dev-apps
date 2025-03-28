@@ -35,13 +35,14 @@ public class NonBlocking10Controller extends AbstractTestController implements M
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public CompletableFuture<Response> post(JsonObject req) {
-        ExecutorService executor = getExecutor(THREAD_MODE);
+final long startTime = System.nanoTime();
+        final ExecutorService executor = getExecutor(THREAD_MODE);
         return CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
-                .thenApply(result -> sendResponse(result))
-                .exceptionally(ex -> handleError(ex));
+                .thenApply(result -> sendResponse(result, startTime))
+                .exceptionally(ex -> handleError(ex, startTime));
     }
 
-    private CompletableFuture<JsonObject> generateJsonObject(ExecutorService executor, int depth, int objectsPerLevel, int arraySize, int minValue, int maxValue) {
+    private CompletableFuture<JsonObject> generateJsonObject(final ExecutorService executor, int depth, int objectsPerLevel, int arraySize, int minValue, int maxValue) {
         return CompletableFuture.supplyAsync(() -> {
             final JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
 
@@ -74,7 +75,7 @@ public class NonBlocking10Controller extends AbstractTestController implements M
     @Override
     protected JsonObject test(JsonObject jsonInput) {
         final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
-        ExecutorService executor = getExecutor(taskThreadMode);
+        final ExecutorService executor = getExecutor(taskThreadMode);
 
         final int depth = jsonInput.getInt("depth", DEFAULT_DEPTH);
         final int objectsPerLevel = jsonInput.getInt("objectsPerLevel", DEFAULT_OBJECTS_PER_LEVEL);

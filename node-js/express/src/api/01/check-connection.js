@@ -1,4 +1,4 @@
-export default (req, res) => {
+export default (req) => {
     const { name } = req.body;
 
     if (name) {

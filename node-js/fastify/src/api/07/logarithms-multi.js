@@ -12,9 +12,9 @@ const threadPool = createThreadPool('./src/workers/07.js');
     );
 })();
 
-export default async (req, res) => {
-    const threads = Number(req.body.threads ?? process.env.THREAD_POOL_SIZE ?? 1);
-    const iterations = Number(req.body.iterations ?? DEFAULT_ITERATIONS);
+export default async (request) => {
+    const threads = Number(request.body.threads ?? process.env.THREAD_POOL_SIZE ?? 1);
+    const iterations = Number(request.body.iterations ?? DEFAULT_ITERATIONS);
 
     let finiteCount = 0;
 

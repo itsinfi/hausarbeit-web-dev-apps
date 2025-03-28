@@ -4,7 +4,7 @@ const DEFAULT_ARRAY_SIZE = 1000;
 const DEFAULT_MIN_VALUE = 0;
 const DEFAULT_MAX_VALUE = 1000;
 
-export default async (req, res) => {
+export default async (req) => {
     const threads = Number(req.body.threads ?? process.env.THREAD_POOL_SIZE ?? 1);
     const arraySize = Number(req.body.arraySize ?? DEFAULT_ARRAY_SIZE);
     const minValue = Number(req.body.minValue ?? DEFAULT_MIN_VALUE);

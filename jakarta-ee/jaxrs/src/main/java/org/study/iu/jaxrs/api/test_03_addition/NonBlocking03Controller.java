@@ -31,17 +31,18 @@ public class NonBlocking03Controller extends AbstractTestController implements M
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public CompletableFuture<Response> post(JsonObject req) {
-        ExecutorService executor = getExecutor(THREAD_MODE);
+final long startTime = System.nanoTime();
+        final ExecutorService executor = getExecutor(THREAD_MODE);
         return CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
-                .thenApply(result -> sendResponse(result))
-                .exceptionally(ex -> handleError(ex));
+                .thenApply(result -> sendResponse(result, startTime))
+                .exceptionally(ex -> handleError(ex, startTime));
     }
 
     @Override
     protected JsonObject test(JsonObject jsonInput) {
         final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
         final int threads = jsonInput.getInt("threads", DEFAULT_THREADS);
-        ExecutorService executor = getExecutor(taskThreadMode);
+        final ExecutorService executor = getExecutor(taskThreadMode);
         
         final int iterations = jsonInput.getInt("iterations", DEFAULT_ITERATIONS);
         final int lowerBound = jsonInput.getInt("lowerBound", DEFAULT_LOWER_BOUND);

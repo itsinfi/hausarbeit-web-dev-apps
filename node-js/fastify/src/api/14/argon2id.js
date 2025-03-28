@@ -7,25 +7,25 @@ const DEFAULT_ARGON2_MEMORY_IN_KB = 65536;
 const DEFAULT_SALT_SIZE = 128;
 const DEFAULT_TASK_AMOUNT = 10;
 
-function hashPassword(password, argon2Options, saltSize) {
+async function hashPassword(password, argon2Options, saltSize) {
     const salt = crypto.randomBytes(saltSize);
-    return Promise.resolve(argon2.hash(password, {
+    return await argon2.hash(password, {
         ...argon2Options,
         salt,
-    }));
+    });
 }
 
-function verifyPassword(hash, password) {
-    return Promise.resolve(argon2.verify(hash, password));
+async function verifyPassword(hash, password) {
+    return await argon2.verify(hash, password);
 }
 
-export default (req, res) => {
-    const password = String(req.body.password ?? '');
-    const iterations = Number(req.body.iterations ?? DEFAULT_ARGON2_ITERATIONS);
-    const parallelism = Number(req.body.parallelism ?? DEFAULT_ARGON2_PARALLELISM);
-    const memoryInKb = Number(req.body.memoryInKb ?? DEFAULT_ARGON2_MEMORY_IN_KB);
-    const saltSize = Number(req.body.saltSize ?? DEFAULT_SALT_SIZE);
-    const taskAmount = Number(req.body.taskAmount ?? DEFAULT_TASK_AMOUNT);
+export default async (request) => {
+    const password = String(request.body.password ?? '');
+    const iterations = Number(request.body.iterations ?? DEFAULT_ARGON2_ITERATIONS);
+    const parallelism = Number(request.body.parallelism ?? DEFAULT_ARGON2_PARALLELISM);
+    const memoryInKb = Number(request.body.memoryInKb ?? DEFAULT_ARGON2_MEMORY_IN_KB);
+    const saltSize = Number(request.body.saltSize ?? DEFAULT_SALT_SIZE);
+    const taskAmount = Number(request.body.taskAmount ?? DEFAULT_TASK_AMOUNT);
 
     if (!password) {
         return;
@@ -42,8 +42,8 @@ export default (req, res) => {
     let result = [];
 
     for (let i = 0; i < taskAmount; i++) {
-        const hashedPassword = hashPassword(password, argon2Options, saltSize);
-        const checkAuth = verifyPassword(hashedPassword, password, argon2Options, saltSize);
+        const hashedPassword = await hashPassword(password, argon2Options, saltSize);
+        const checkAuth = await verifyPassword(hashedPassword, password, argon2Options, saltSize);
         
         result.push({ hashedPassword, checkAuth });
     }

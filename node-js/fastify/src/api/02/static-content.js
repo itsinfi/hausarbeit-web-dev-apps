@@ -1,8 +1,8 @@
 const DEFAULT_LENGTH = 1000;
 
 const CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-export default (req, res) => {
-    const length = Number(req.body.length ?? DEFAULT_LENGTH);
+export default (request) => {
+    const length = Number(request.body.length ?? DEFAULT_LENGTH);
 
     let result = '';
 

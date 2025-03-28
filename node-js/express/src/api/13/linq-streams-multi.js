@@ -14,7 +14,7 @@ const threadPool = createThreadPool('./src/workers/13.js');
     );
 })();
 
-export default async (req, res) => {
+export default async (req) => {
     const parallelizationThreshold = Number(req.body.parallelizationThreshold ?? DEFAULT_PARALLELIZATION_THRESHOLD);
     const nestingParallelizationLimit = Number(req.body.nestingParallelizationLimit ?? DEFAULT_NESTING_PARALLELIZATION_LIMIT);
 

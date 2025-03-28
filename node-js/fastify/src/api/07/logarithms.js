@@ -1,7 +1,7 @@
 const DEFAULT_ITERATIONS = 1000;
 
-export default (req, res) => {
-    const iterations = Number(req.body.iterations ?? DEFAULT_ITERATIONS);
+export default (request) => {
+    const iterations = Number(request.body.iterations ?? DEFAULT_ITERATIONS);
 
     let finiteCount = 0;
 

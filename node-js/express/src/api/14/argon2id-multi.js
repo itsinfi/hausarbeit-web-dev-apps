@@ -16,7 +16,7 @@ const threadPool = createThreadPool('./src/workers/14.js');
     );
 })();
 
-export default async (req, res) => {
+export default async (req) => {
     const password = String(req.body.password ?? '');
     const iterations = Number(req.body.iterations ?? DEFAULT_ARGON2_ITERATIONS);
     const parallelism = Number(req.body.parallelism ?? DEFAULT_ARGON2_PARALLELISM);

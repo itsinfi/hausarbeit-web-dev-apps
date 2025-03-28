@@ -25,11 +25,12 @@ public class BlockingTest07Controller extends AbstractTestController {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public Response post(JsonObject req) {
+final long startTime = System.nanoTime();
         try {
             JsonObject result = handleRoute(req);
-            return sendResponse(result);
+            return sendResponse(result, startTime);
         } catch (Exception ex) {
-            return handleError(ex);
+            return handleError(ex, startTime);
         }
     }
     

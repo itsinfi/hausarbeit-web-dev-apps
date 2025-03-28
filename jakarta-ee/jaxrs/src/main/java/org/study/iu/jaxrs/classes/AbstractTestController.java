@@ -1,6 +1,5 @@
 package org.study.iu.jaxrs.classes;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -23,48 +22,31 @@ public abstract class AbstractTestController {
     protected static final ExecutorService threadPoolExecutor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
     protected static final ExecutorService virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor();
 
+    private String getProcessingTimeHeaderValue(long startTime) {
+        final long endTime = System.nanoTime();
+        final double duration = (endTime - startTime) / 1_000_000.0;
+        return Double.toString(duration);
+    }
+
     protected JsonObject handleRoute(JsonObject req) {
         ThreadMonitor.countThreads();
         return test(req);
     }
     
-    protected Response sendResponse(JsonObject jsonOutput) {
-        return Response.ok(jsonOutput).build();
-    }
-
-    protected Response handleError(Throwable ex) {
+    protected Response handleError(Throwable ex, long startTime) {
         ex.printStackTrace();
         return Response
                 .serverError()
+                .header("processing-time", getProcessingTimeHeaderValue(startTime))
                 .entity(Json.createObjectBuilder()
-                        .add("error", ex.getMessage())
-                        .build())
-                .build();
-    }
-
-    protected Response handlePost(JsonObject req) {
-        try {
-            JsonObject result = handleRoute(req);
-            return sendResponse(result);
-        } catch (Exception ex) {
-            return handleError(ex);
-        }
-    }
-
-    protected CompletableFuture<Response> handlePostAsync(JsonObject req) {
-        ExecutorService executor = getExecutor(THREAD_MODE);
-        return CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
-                .thenApply(result -> sendResponse(result))
-                .exceptionally(ex -> handleError(ex));
+                        .add("error", ex.getMessage()))
+                        .build();
     }
     
-    protected Response handlePostSync(JsonObject req) {
-        try {
-            JsonObject result = handleRoute(req);
-            return sendResponse(result);
-        } catch (Exception ex) {
-            return handleError(ex);
-        }
+    protected Response sendResponse(JsonObject jsonOutput, long startTime) {
+        return Response.ok(jsonOutput)
+                .header("processing-time", getProcessingTimeHeaderValue(startTime))
+                .build();
     }
 
     protected ExecutorService getExecutor(String threadMode) {

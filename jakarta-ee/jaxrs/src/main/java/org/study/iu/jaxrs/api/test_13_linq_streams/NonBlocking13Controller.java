@@ -33,13 +33,14 @@ public class NonBlocking13Controller extends AbstractTestController implements M
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public CompletableFuture<Response> post(JsonObject req) {
-        ExecutorService executor = getExecutor(THREAD_MODE);
+final long startTime = System.nanoTime();
+        final ExecutorService executor = getExecutor(THREAD_MODE);
         return CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
-                .thenApply(result -> sendResponse(result))
-                .exceptionally(ex -> handleError(ex));
+                .thenApply(result -> sendResponse(result, startTime))
+                .exceptionally(ex -> handleError(ex, startTime));
     }
 
-    private void flattenJson(JsonValue json, List<Double> numbers, ExecutorService executor, int depth, int parallelizationThreshold, int nestingParallelizationLimit) {
+    private void flattenJson(JsonValue json, List<Double> numbers, final ExecutorService executor, int depth, int parallelizationThreshold, int nestingParallelizationLimit) {
         switch (json.getValueType()) {
             case OBJECT -> {
                 final JsonObject jsonObject = json.asJsonObject();
@@ -84,7 +85,7 @@ public class NonBlocking13Controller extends AbstractTestController implements M
         final int nestingParallelizationLimit = jsonInput.getInt("nestingParallelizationLimit",
                 DEFAULT_NESTING_PARALLELIZATION_LIMIT);
         final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
-        ExecutorService executor = getExecutor(taskThreadMode);
+        final ExecutorService executor = getExecutor(taskThreadMode);
 
         final List<Double> numbers = Collections.synchronizedList(new ArrayList<>());
 

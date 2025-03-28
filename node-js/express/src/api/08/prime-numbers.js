@@ -1,6 +1,6 @@
 const DEFAULT_AMOUNT = 1000;
 
-export default (req, res) => {
+export default (req) => {
     const amount = Number(req.body.amount ?? DEFAULT_AMOUNT);
 
     let primes = [];
