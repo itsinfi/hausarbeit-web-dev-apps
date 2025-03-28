@@ -32,6 +32,7 @@ services:
     environment:
       - THREAD_MODE=${THREAD_MODE}
       - THREAD_POOL_SIZE=${THREAD_POOL_SIZE}
+      - CLUSTER_COUNT=${CLUSTER_COUNT}
     ports: 
       - "3002:9080"
 

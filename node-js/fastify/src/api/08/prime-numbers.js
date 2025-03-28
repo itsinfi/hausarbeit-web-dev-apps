@@ -1,7 +1,7 @@
 const DEFAULT_AMOUNT = 1000;
 
-export default async (request, reply) => {
-    const amount = Number(request.body.amount ?? DEFAULT_AMOUNT);
+export default (req, res) => {
+    const amount = Number(req.body.amount ?? DEFAULT_AMOUNT);
 
     let primes = [];
     let limit = amount;
@@ -37,9 +37,9 @@ export default async (request, reply) => {
 
     const result = primes.slice(0, amount);
 
-    reply.send({
+    return {
         iterations,
         found: result.length,
         result,
-    });
+    };
 }

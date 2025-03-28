@@ -13,12 +13,12 @@ const threadPool = createThreadPool('./src/workers/02.js');
     );
 })();
 
-export default async (request, reply) => {
-    const threads = Number(request.body.threads ?? config.THREAD_POOL_SIZE ?? 1);
-    const length = Number(request.body.length ?? DEFAULT_LENGTH);
+export default async (req, res) => {
+    const threads = Number(req.body.threads ?? process.env.THREAD_POOL_SIZE ?? 1);
+    const length = Number(req.body.length ?? DEFAULT_LENGTH);
 
     if (threads <= 1) {
-        return staticContent(request, reply);
+        return staticContent(req, res);
     }
     
     let promises = [];
@@ -35,9 +35,9 @@ export default async (request, reply) => {
 
     const result = results.join('');
 
-    reply.send({
+    return {
         threads,
         length,
         result,
-    });
+    };
 }

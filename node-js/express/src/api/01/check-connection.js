@@ -1,7 +1,7 @@
-export default async (req, res) => {
+export default (req, res) => {
     const { name } = req.body;
 
     if (name) {
-        res.json({ result: `Hello ${name}!` });
+        return { result: `Hello ${name}!` };
     }
 }

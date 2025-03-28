@@ -1,7 +1,7 @@
-export default async (request, reply) => {
-    const { name } = request.body;
+export default (req, res) => {
+    const { name } = req.body;
 
     if (name) {
-        reply.send({ result: `Hello ${name}!` });
+        return { result: `Hello ${name}!` };
     }
 }

@@ -8,13 +8,13 @@ function flattenJson(json, numbers) {
     }
 }
 
-export default async (req, res) => {
+export default (req, res) => {
     let numbers = [];
 
     flattenJson(req.body, numbers);
 
-    res.json({
+    return {
         found: numbers.length,
         result: numbers,
-    });
+    };
 }

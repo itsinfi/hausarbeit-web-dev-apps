@@ -1,7 +1,7 @@
 const DEFAULT_ITERATIONS = 1000;
 
-export default async (request, reply) => {
-    const iterations = Number(request.body.iterations ?? DEFAULT_ITERATIONS);
+export default (req, res) => {
+    const iterations = Number(req.body.iterations ?? DEFAULT_ITERATIONS);
 
     let finiteCount = 0;
 
@@ -17,8 +17,8 @@ export default async (request, reply) => {
         }
     }
 
-    reply.send({ 
+    return { 
         iterations,
         result: finiteCount,
-    });
+    };
 }

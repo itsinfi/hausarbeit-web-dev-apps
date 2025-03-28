@@ -11,15 +11,15 @@ function flattenJson(json, numbers) {
     }
 }
 
-export default async (request, reply) => {
+export default (req, res) => {
     let numbers = [];
 
-    flattenJson(request.body, numbers);
+    flattenJson(req.body, numbers);
 
     numbers.sort((a, b) => a - b);
 
-    reply.send({
+    return {
         amount: numbers.length,
         result: numbers,
-    });
+    };
 }

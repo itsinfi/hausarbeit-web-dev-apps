@@ -1,91 +1,26 @@
-import express, { Router, json } from 'express';
-import checkConnection from './api/01/check-connection.js';
-import staticContent from './api/02/static-content.js';
-import addition from './api/03/addition.js';
-import multiplication from './api/04/multiplication.js';
-import division from './api/05/division.js';
-import powers from './api/06/powers.js';
-import logarithms from './api/07/logarithms.js';
-import primeNumbers from './api/08/prime-numbers.js';
-import readJson from './api/09/read-json.js';
-import writeJson from './api/10/write-json.js';
-import sortWholeNumbers from './api/11/sort-whole-numbers.js';
-import sortRealNumbers from './api/12/sort-real-numbers.js';
-import linqStreams from './api/13/linq-streams.js';
-import argon2id from './api/14/argon2id.js';
-import staticContentMulti from './api/02/static-content-multi.js';
-import additionMulti from './api/03/addition-multi.js';
-import multiplicationMulti from './api/04/multiplication-multi.js';
-import divisionMulti from './api/05/division-multi.js';
-import powersMulti from './api/06/powers-multi.js';
-import logarithmsMulti from './api/07/logarithms-multi.js';
-import primeNumbersMulti from './api/08/prime-numbers-multi.js';
-import readJsonMulti from './api/09/read-json-multi.js';
-import writeJsonMulti from './api/10/write-json-multi.js';
-import sortWholeNumbersMulti from './api/11/sort-whole-numbers-multi.js';
-import sortRealNumbersMulti from './api/12/sort-real-numbers-multi.js';
-import linqStreamsMulti from './api/13/linq-streams-multi.js';
-import argon2idMulti from './api/14/argon2id-multi.js';
+import cluster from 'node:cluster';
+import process from 'node:process';
+import startServer from './start-server.js';
+import config from './config/config.js';
 
-const app = express();
-const router = Router();
+console.log('CLUSTER_COUNT:', process.env.CLUSTER_COUNT);
+console.log('THREAD_POOL_SIZE:', process.env.THREAD_POOL_SIZE);
+console.log('THREAD_MODE', process.env.THREAD_MODE);
 
-app.use(json());
+const clusterCount = process.env.CLUSTER_COUNT ?? 1;
 
-const routes = {
-    '/01': checkConnection,
-    '/01_multi': checkConnection,
-    '/02': staticContent,
-    '/02_multi': staticContentMulti,
-    '/03': addition,
-    '/03_multi': additionMulti,
-    '/04': multiplication,
-    '/04_multi': multiplicationMulti,
-    '/05': division,
-    '/05_multi': divisionMulti,
-    '/06': powers,
-    '/06_multi': powersMulti,
-    '/07': logarithms,
-    '/07_multi': logarithmsMulti,
-    '/08': primeNumbers,
-    '/08_multi': primeNumbersMulti,
-    '/09': readJson,
-    '/09_multi': readJsonMulti,
-    '/10': writeJson,
-    '/10_multi': writeJsonMulti,
-    '/11': sortWholeNumbers,
-    '/11_multi': sortWholeNumbersMulti,
-    '/12': sortRealNumbers,
-    '/12_multi': sortRealNumbersMulti,
-    '/13': linqStreams,
-    '/13_multi': linqStreamsMulti,
-    '/14': argon2id,
-    '/14_multi': argon2idMulti,
-}
+if (cluster.isPrimary) {
+    console.log(`Primary ${process.pid} is running`);
 
-const routeHandler = (route) => (req, res, next) => {
-    Promise.resolve(route(req, res)).catch(next);
-};
+    for (let i = 0; i < clusterCount; i++) {
+        cluster.fork();
+    }
 
-const errorHandler = (err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({
-        message: 'Internal Server Error',
-        error: err.message,
+    cluster.on('exit', (worker) => {
+        console.log(`worker ${worker.process.pid} died`);
     });
-};
+} else {
+    startServer();
 
-Object.entries(routes).forEach(([path, route]) => {
-    router.post(path, routeHandler(route));
-});
-
-app.use('/api', router);
-
-app.use(errorHandler);
-process.on('uncaughtException', (err) => console.error(err));
-process.on('unhandledRejection', (err) => console.error(err));
-
-const port = 3000;
-app.listen(port, async () => {
-    console.log(`express running at http://localhost:${port}/`);
-});
+    console.log(`Worker ${process.pid} started`);
+}

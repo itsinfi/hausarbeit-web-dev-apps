@@ -1,6 +1,5 @@
 import flattenJsonMulti from '../../utils/09/flatten-json-multi.js';
 import createThreadPool from '../../utils/create-thread-pool.js';
-import config from '../../config/config.js';
 
 const DEFAULT_PARALLELIZATION_THRESHOLD = 3;
 const DEFAULT_NESTING_PARALLELIZATION_LIMIT = 3;
@@ -14,18 +13,18 @@ const threadPool = createThreadPool('./src/workers/09.js');
     );
 })();
 
-export default async (request, reply) => {
-    const parallelizationThreshold = Number(request.body.parallelizationThreshold ?? DEFAULT_PARALLELIZATION_THRESHOLD);
-    const nestingParallelizationLimit = Number(request.body.nestingParallelizationLimit ?? DEFAULT_NESTING_PARALLELIZATION_LIMIT);
+export default async (req, res) => {
+    const parallelizationThreshold = Number(req.body.parallelizationThreshold ?? DEFAULT_PARALLELIZATION_THRESHOLD);
+    const nestingParallelizationLimit = Number(req.body.nestingParallelizationLimit ?? DEFAULT_NESTING_PARALLELIZATION_LIMIT);
 
     let numbers = [];
 
-    await flattenJsonMulti(request.body, numbers, 0, parallelizationThreshold, nestingParallelizationLimit, threadPool);
+    await flattenJsonMulti(req.body, numbers, 0, parallelizationThreshold, nestingParallelizationLimit, threadPool);
 
-    reply.send({
+    return {
         parallelizationThreshold,
         nestingParallelizationLimit,
         found: numbers.length,
         result: numbers,
-    });
+    };
 }

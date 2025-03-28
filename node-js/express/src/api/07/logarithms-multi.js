@@ -1,6 +1,5 @@
 const logarithms = './logarithms.js';
 import createThreadPool from '../../utils/create-thread-pool.js';
-import config from '../../config/config.js';
 
 const DEFAULT_ITERATIONS = 1000;
 
@@ -14,7 +13,7 @@ const threadPool = createThreadPool('./src/workers/07.js');
 })();
 
 export default async (req, res) => {
-    const threads = Number(req.body.threads ?? config.THREAD_POOL_SIZE ?? 1);
+    const threads = Number(req.body.threads ?? process.env.THREAD_POOL_SIZE ?? 1);
     const iterations = Number(req.body.iterations ?? DEFAULT_ITERATIONS);
 
     let finiteCount = 0;
@@ -33,9 +32,9 @@ export default async (req, res) => {
 
     results.forEach(r => finiteCount += r);
 
-    res.json({ 
+    return { 
         threads,
         iterations,
         result: finiteCount,
-    });
+    };
 }

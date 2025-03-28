@@ -1,6 +1,5 @@
 const primeNumbers = './prime-numbers.js';
 import createThreadPool from '../../utils/create-thread-pool.js';
-import config from '../../config/config.js';
 
 const DEFAULT_AMOUNT = 1000;
 
@@ -13,12 +12,12 @@ const threadPool = createThreadPool('./src/workers/08.js');
     );
 })();
 
-export default async (request, reply) => {
-    const threads = Number(request.body.threads ?? config.THREAD_POOL_SIZE ?? 1);
-    const amount = Number(request.body.amount ?? DEFAULT_AMOUNT);
+export default async (req, res) => {
+    const threads = Number(req.body.threads ?? process.env.THREAD_POOL_SIZE ?? 1);
+    const amount = Number(req.body.amount ?? DEFAULT_AMOUNT);
 
     if (threads <= 1) {
-        return primeNumbers(request, reply);
+        return primeNumbers(req, res);
     }
 
     let primes = [];
@@ -68,10 +67,10 @@ export default async (request, reply) => {
 
     const result = primes.slice(0, amount);
 
-    reply.send({
+    return {
         threads,
         iterations,
         found: result.length,
         result,
-    });
+    };
 }

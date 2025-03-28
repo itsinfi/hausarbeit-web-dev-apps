@@ -10,8 +10,8 @@ export default (req, res) => {
         result += CHARACTERS[Math.floor(Math.random() * (CHARACTERS.length + 1))];
     }
 
-    res.json({
+    return {
         length,
         result,
-    });
+    };
 }

@@ -1,5 +1,4 @@
 import createThreadPool from '../../utils/create-thread-pool.js';
-import config from '../../config/config.js';
 import { argon2id } from 'argon2';
 
 const DEFAULT_ARGON2_ITERATIONS = 3;
@@ -45,7 +44,7 @@ export default async (req, res) => {
 
     const result = await Promise.all(Array(taskAmount).fill().map(task));
 
-    res.json({
+    return {
         password,
         iterations,
         parallelism,
@@ -53,5 +52,5 @@ export default async (req, res) => {
         saltSize,
         taskAmount,
         result,
-    });
+    };
 }

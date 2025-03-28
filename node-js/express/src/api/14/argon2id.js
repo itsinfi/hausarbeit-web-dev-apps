@@ -7,19 +7,19 @@ const DEFAULT_ARGON2_MEMORY_IN_KB = 65536;
 const DEFAULT_SALT_SIZE = 128;
 const DEFAULT_TASK_AMOUNT = 10;
 
-async function hashPassword(password, argon2Options, saltSize) {
+function hashPassword(password, argon2Options, saltSize) {
     const salt = crypto.randomBytes(saltSize);
-    return await argon2.hash(password, {
+    return Promise.resolve(argon2.hash(password, {
         ...argon2Options,
         salt,
-    });
+    }));
 }
 
-async function verifyPassword(hash, password) {
-    return await argon2.verify(hash, password);
+function verifyPassword(hash, password) {
+    return Promise.resolve(argon2.verify(hash, password));
 }
 
-export default async (req, res) => {
+export default (req, res) => {
     const password = String(req.body.password ?? '');
     const iterations = Number(req.body.iterations ?? DEFAULT_ARGON2_ITERATIONS);
     const parallelism = Number(req.body.parallelism ?? DEFAULT_ARGON2_PARALLELISM);
@@ -42,13 +42,13 @@ export default async (req, res) => {
     let result = [];
 
     for (let i = 0; i < taskAmount; i++) {
-        const hashedPassword = await hashPassword(password, argon2Options, saltSize);
-        const checkAuth = await verifyPassword(hashedPassword, password, argon2Options, saltSize);
+        const hashedPassword = hashPassword(password, argon2Options, saltSize);
+        const checkAuth = verifyPassword(hashedPassword, password, argon2Options, saltSize);
         
         result.push({ hashedPassword, checkAuth });
     }
 
-    res.json({
+    return {
         password,
         iterations,
         parallelism,
@@ -56,5 +56,5 @@ export default async (req, res) => {
         saltSize,
         taskAmount,
         result,
-    });
+    };
 }

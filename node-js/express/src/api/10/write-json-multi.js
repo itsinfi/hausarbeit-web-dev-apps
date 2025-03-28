@@ -1,5 +1,4 @@
 import createThreadPool from '../../utils/create-thread-pool.js';
-import config from '../../config/config.js';
 import generateJsonObject from '../../utils/10/generate-json-object-multi.js';
 
 const DEFAULT_DEPTH = 3;
@@ -26,12 +25,12 @@ export default async (req, res) => {
 
     const result = await generateJsonObject(depth, objectsPerLevel, arraySize, minValue, maxValue, threadPool);
 
-    res.json({
+    return {
         depth,
         objectsPerLevel,
         arraySize,
         minValue,
         maxValue,
         result,
-    });
+    };
 }

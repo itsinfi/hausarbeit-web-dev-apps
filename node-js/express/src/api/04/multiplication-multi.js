@@ -1,6 +1,5 @@
 const multiplication = './multiplication.js';
 import createThreadPool from '../../utils/create-thread-pool.js';
-import config from '../../config/config.js';
 
 const DEFAULT_ITERATIONS = 1000;
 const DEFAULT_LOWER_BOUND = 1;
@@ -16,7 +15,7 @@ const threadPool = createThreadPool('./src/workers/04.js');
 })();
 
 export default async (req, res) => {
-    const threads = Number(req.body.threads ?? config.THREAD_POOL_SIZE ?? 1);
+    const threads = Number(req.body.threads ?? process.env.THREAD_POOL_SIZE ?? 1);
     const iterations = Number(req.body.iterations ?? DEFAULT_ITERATIONS);
     const lowerBound = Number(req.body.lowerBound ?? DEFAULT_LOWER_BOUND);
     const upperBound = Number(req.body.upperBound ?? DEFAULT_UPPER_BOUND);
@@ -43,11 +42,11 @@ export default async (req, res) => {
 
     results.forEach(r => product *= r);
 
-    res.json({ 
+    return { 
         threads,
         iterations,
         lowerBound,
         upperBound,
         result: product,
-    });
+    };
 }

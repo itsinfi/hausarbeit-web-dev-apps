@@ -1,8 +1,8 @@
 const DEFAULT_LENGTH = 1000;
 
 const CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-export default async (request, reply) => {
-    const length = Number(request.body.length ?? DEFAULT_LENGTH);
+export default (req, res) => {
+    const length = Number(req.body.length ?? DEFAULT_LENGTH);
 
     let result = '';
 
@@ -10,8 +10,8 @@ export default async (request, reply) => {
         result += CHARACTERS[Math.floor(Math.random() * (CHARACTERS.length + 1))];
     }
 
-    reply.send({
+    return {
         length,
         result,
-    });
+    };
 }

@@ -1,6 +1,6 @@
 const DEFAULT_ITERATIONS = 1000;
 
-export default async (req, res) => {
+export default (req, res) => {
     const iterations = Number(req.body.iterations ?? DEFAULT_ITERATIONS);
 
     let finiteCount = 0;
@@ -17,8 +17,8 @@ export default async (req, res) => {
         }
     }
 
-    res.json({ 
+    return { 
         iterations,
         result: finiteCount,
-    });
+    };
 }
