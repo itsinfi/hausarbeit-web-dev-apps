@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.concurrent.CompletableFuture;
 
-import org.study.iu.jaxrs.classes.AbstractAsyncTestController;
+import org.study.iu.jaxrs.classes.AbstractTestController;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -21,13 +21,18 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("13")
-public class SingleThreadedTest13Controller extends AbstractAsyncTestController {
+public class SingleThreadedTest13Controller extends AbstractTestController {
 
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public CompletableFuture<Response> post(JsonObject req) {
-        return handlePost(req);
+    public Response post(JsonObject req) {
+        try {
+            JsonObject result = handleRoute(req);
+            return sendResponse(result);
+        } catch (Exception ex) {
+            return handleError(ex);
+        }
     }
     
     private void flattenJson(JsonValue json, ArrayList<Double> numbers) {

@@ -15,9 +15,29 @@ import org.study.iu.httpservlet.interfaces.MultiThreadingTestable;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.AsyncContext;
 
 @WebServlet(value = "/api/05_multi", asyncSupported = true)
 public class MultiThreadedTest05Servlet extends SingleThreadedTest05Servlet implements MultiThreadingTestable {
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) {
+        res.setContentType("application/json");
+        res.setCharacterEncoding("UTF-8");
+
+        AsyncContext asyncContext = req.startAsync();
+
+        ExecutorService executor = getExecutor(THREAD_MODE);
+
+        CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
+                .thenApply(result -> sendResponse(res, result, asyncContext))
+                .exceptionally(ex -> handleError(ex, asyncContext));
+
+        return;
+    }
+
     @Override
     protected JsonObject test(JsonObject jsonInput) {
         final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);

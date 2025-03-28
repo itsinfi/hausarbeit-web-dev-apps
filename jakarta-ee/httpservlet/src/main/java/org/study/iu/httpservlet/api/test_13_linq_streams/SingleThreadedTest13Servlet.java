@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import org.study.iu.httpservlet.classes.AbstractAsyncTestServlet;
+import org.study.iu.httpservlet.classes.AbstractTestServlet;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -15,7 +15,7 @@ import jakarta.json.JsonValue;
 import jakarta.servlet.annotation.WebServlet;
 
 @WebServlet(value = "/api/13", asyncSupported = true)
-public class SingleThreadedTest13Servlet extends AbstractAsyncTestServlet {
+public class SingleThreadedTest13Servlet extends AbstractTestServlet {
     
     private void flattenJson(JsonValue json, ArrayList<Double> numbers) {
         switch (json.getValueType()) {

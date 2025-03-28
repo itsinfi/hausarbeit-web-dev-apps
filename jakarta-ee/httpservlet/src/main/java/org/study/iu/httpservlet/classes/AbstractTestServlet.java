@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -18,7 +17,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-public abstract class AbstractAsyncTestServlet extends HttpServlet {
+public abstract class AbstractTestServlet extends HttpServlet {
 
     protected static final String THREAD_MODE = System.getenv("THREAD_MODE");
     protected static final int THREAD_POOL_SIZE = Integer.parseInt(System.getenv("THREAD_POOL_SIZE"));
@@ -30,8 +29,8 @@ public abstract class AbstractAsyncTestServlet extends HttpServlet {
     protected static final ExecutorService threadPoolExecutor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
     protected static final ExecutorService virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor();
 
-    private JsonObject handleRoute(HttpServletRequest req) {
-        ThreadMonitor.countThreads();
+    protected JsonObject handleRoute(HttpServletRequest req) {
+        // ThreadMonitor.countThreads();
         try (
             final InputStream inputStream = req.getInputStream();
             final JsonReader jsonReader = Json.createReader(new InputStreamReader(inputStream, "UTF-8"))
@@ -44,20 +43,22 @@ public abstract class AbstractAsyncTestServlet extends HttpServlet {
         return JsonObject.EMPTY_JSON_OBJECT;
     }
     
-    private Void sendResponse(HttpServletResponse res, JsonObject jsonOutput, AsyncContext asyncContext) {
-        ThreadMonitor.countThreads();
+    protected Void sendResponse(HttpServletResponse res, JsonObject jsonOutput, AsyncContext asyncContext) {
+        // ThreadMonitor.countThreads();
         try (final PrintWriter out = res.getWriter()) {
             out.print(jsonOutput.toString());
             out.flush();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            asyncContext.complete();
+            if (asyncContext != null) {
+                asyncContext.complete();
+            }
         }
         return null;
     }
 
-    private Void handleError(Throwable ex, AsyncContext asyncContext) {
+    protected Void handleError(Throwable ex, AsyncContext asyncContext) {
         HttpServletResponse res = (HttpServletResponse) asyncContext.getResponse();
 
         ex.printStackTrace();
@@ -74,7 +75,9 @@ public abstract class AbstractAsyncTestServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            asyncContext.complete();
+            if (asyncContext != null) {
+                asyncContext.complete();
+            }
         }
         return null;
     }
@@ -83,14 +86,13 @@ public abstract class AbstractAsyncTestServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse res) {
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
-
-        AsyncContext asyncContext = req.startAsync();
-
-        ExecutorService executor = getExecutor(THREAD_MODE);
-
-        CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
-                .thenApply(result -> sendResponse(res, result, asyncContext))
-                .exceptionally(ex -> handleError(ex, asyncContext));
+        
+        try {
+            JsonObject result = handleRoute(req);
+            sendResponse(res, result, null);
+        } catch (Exception ex) {
+            handleError(ex, null);
+        }
     }
     
     protected ExecutorService getExecutor(String threadMode) {

@@ -1,6 +1,7 @@
 package org.study.iu.jaxrs.api.test_14_argon2id;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -12,19 +13,40 @@ import java.util.stream.IntStream;
 import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
 import org.bouncycastle.crypto.params.Argon2Parameters;
 import org.bouncycastle.util.encoders.Hex;
+import org.study.iu.jaxrs.classes.AbstractTestController;
 import org.study.iu.jaxrs.interfaces.MultiThreadingTestable;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 @Path("14_multi")
-public class MultiThreaded14Controller extends SingleThreadedTest14Controller implements MultiThreadingTestable {
+public class MultiThreaded14Controller extends AbstractTestController implements MultiThreadingTestable {
 
-    @Override
-    protected String hashPassword(String password, int iterations, int parallelism, int memoryInKb, int saltSize) {
+    private static final int DEFAULT_ARGON2_ITERATIONS = 3;
+    private static final int DEFAULT_ARGON2_PARALLELISM = 4;
+    private static final int DEFAULT_ARGON2_MEMORY_IN_KB = 65536;
+    private static final int DEFAULT_SALT_SIZE = 128;
+    private static final int DEFAULT_TASK_AMOUNT = 10;
+
+    @POST
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public CompletableFuture<Response> post(JsonObject req) {
+        ExecutorService executor = getExecutor(THREAD_MODE);
+        return CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
+                .thenApply(result -> sendResponse(result))
+                .exceptionally(ex -> handleError(ex));
+    }
+
+    private String hashPassword(String password, int iterations, int parallelism, int memoryInKb, int saltSize) {
         byte[] salt = new byte[saltSize / 8];
         ThreadLocalRandom.current().nextBytes(salt);
 
@@ -49,14 +71,37 @@ public class MultiThreaded14Controller extends SingleThreadedTest14Controller im
 
         return saltHex + "$" + hashHex;
     }
+
+    private boolean verifyPassword(String password, String storedHash, int iterations, int parallelism, int memoryInKb, int saltSize) {
+        String[] parts = storedHash.split("\\$");
+        String storedSaltHex = parts[0];
+        String storedHashHex = parts[1];
+
+        byte[] salt = Hex.decode(storedSaltHex);
+        byte[] expectedHash = Hex.decode(storedHashHex);
+
+        Argon2Parameters params = new Argon2Parameters.Builder(Argon2Parameters.ARGON2_id)
+                .withIterations(iterations)
+                .withParallelism(parallelism)
+                .withMemoryAsKB(memoryInKb)
+                .withSalt(salt)
+                .build();
+            
+        Argon2BytesGenerator generator = new Argon2BytesGenerator();
+        generator.init(params);
+
+        byte[] passwordBytes = password.getBytes(StandardCharsets.UTF_8);
+        byte[] actualHash = new byte[saltSize / 4];
+
+        generator.generateBytes(passwordBytes, actualHash, 0, actualHash.length);
+
+        return Arrays.equals(actualHash, expectedHash);
+    }
     
     @Override
     protected JsonObject test(JsonObject jsonInput) {
         final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
         ExecutorService executor = getExecutor(taskThreadMode);
-        if (executor == null) {
-            return super.test(jsonInput);
-        }
 
         final String password = jsonInput.getString("password");
         final int iterations = jsonInput.getInt("iterations", DEFAULT_ARGON2_ITERATIONS);

@@ -8,24 +8,41 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.study.iu.jaxrs.classes.AbstractTestController;
 import org.study.iu.jaxrs.interfaces.MultiThreadingTestable;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 @Path("12_multi")
-public class MultiThreaded12Controller extends SingleThreadedTest12Controller implements MultiThreadingTestable {
+public class MultiThreaded12Controller extends AbstractTestController implements MultiThreadingTestable {
+    private static final int DEFAULT_ARRAY_SIZE = 1000;
+    private static final int DEFAULT_MIN_VALUE = 0;
+    private static final int DEFAULT_MAX_VALUE = 1000;
+    
+    @POST
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public CompletableFuture<Response> post(JsonObject req) {
+        ExecutorService executor = getExecutor(THREAD_MODE);
+        return CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
+                .thenApply(result -> sendResponse(result))
+                .exceptionally(ex -> handleError(ex));
+    }
+
     @Override
     protected JsonObject test(JsonObject jsonInput) {
         final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
         final int threads = jsonInput.getInt("threads", DEFAULT_THREADS);
         ExecutorService executor = getExecutor(taskThreadMode);
-        if (executor == null || threads <= 1) {
-            return super.test(jsonInput);
-        }
 
         final int arraySize = jsonInput.getInt("arraySize", DEFAULT_ARRAY_SIZE);
         final int minValue = jsonInput.getInt("minValue", DEFAULT_MIN_VALUE);

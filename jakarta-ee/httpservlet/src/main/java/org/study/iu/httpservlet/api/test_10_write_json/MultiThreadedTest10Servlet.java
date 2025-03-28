@@ -14,10 +14,30 @@ import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
+import jakarta.servlet.AsyncContext;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet(value = "/api/10_multi", asyncSupported = true)
 public class MultiThreadedTest10Servlet extends SingleThreadedTest10Servlet implements MultiThreadingTestable {
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) {
+        res.setContentType("application/json");
+        res.setCharacterEncoding("UTF-8");
+
+        AsyncContext asyncContext = req.startAsync();
+
+        ExecutorService executor = getExecutor(THREAD_MODE);
+
+        CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
+                .thenApply(result -> sendResponse(res, result, asyncContext))
+                .exceptionally(ex -> handleError(ex, asyncContext));
+
+        return;
+    }
+
     private CompletableFuture<JsonObject> generateJsonObject(ExecutorService executor, int depth, int objectsPerLevel, int arraySize, int minValue, int maxValue) {
         return CompletableFuture.supplyAsync(() -> {
             final JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();

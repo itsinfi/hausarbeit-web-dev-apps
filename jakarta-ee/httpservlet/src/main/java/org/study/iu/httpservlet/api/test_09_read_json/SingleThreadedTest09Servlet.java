@@ -3,7 +3,7 @@ package org.study.iu.httpservlet.api.test_09_read_json;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.study.iu.httpservlet.classes.AbstractAsyncTestServlet;
+import org.study.iu.httpservlet.classes.AbstractTestServlet;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -14,7 +14,7 @@ import jakarta.json.JsonValue;
 import jakarta.servlet.annotation.WebServlet;
 
 @WebServlet(value = "/api/09", asyncSupported = true)
-public class SingleThreadedTest09Servlet extends AbstractAsyncTestServlet {
+public class SingleThreadedTest09Servlet extends AbstractTestServlet {
 
     private void flattenJson(JsonValue json, List<Double> numbers) {
         switch (json.getValueType()) {

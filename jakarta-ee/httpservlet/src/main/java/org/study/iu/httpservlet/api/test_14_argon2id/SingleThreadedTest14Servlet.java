@@ -7,7 +7,7 @@ import java.util.Arrays;
 import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
 import org.bouncycastle.crypto.params.Argon2Parameters;
 import org.bouncycastle.util.encoders.Hex;
-import org.study.iu.httpservlet.classes.AbstractAsyncTestServlet;
+import org.study.iu.httpservlet.classes.AbstractTestServlet;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -16,7 +16,7 @@ import jakarta.json.JsonObject;
 import jakarta.servlet.annotation.WebServlet;
 
 @WebServlet(value = "/api/14", asyncSupported = true)
-public class SingleThreadedTest14Servlet extends AbstractAsyncTestServlet {
+public class SingleThreadedTest14Servlet extends AbstractTestServlet {
     protected static final int DEFAULT_ARGON2_ITERATIONS = 3;
     protected static final int DEFAULT_ARGON2_PARALLELISM = 4;
     protected static final int DEFAULT_ARGON2_MEMORY_IN_KB = 65536;

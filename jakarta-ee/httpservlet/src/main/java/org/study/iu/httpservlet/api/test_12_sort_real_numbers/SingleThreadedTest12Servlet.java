@@ -3,7 +3,7 @@ package org.study.iu.httpservlet.api.test_12_sort_real_numbers;
 import java.util.Arrays;
 import java.util.Random;
 
-import org.study.iu.httpservlet.classes.AbstractAsyncTestServlet;
+import org.study.iu.httpservlet.classes.AbstractTestServlet;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -12,7 +12,7 @@ import jakarta.json.JsonObject;
 import jakarta.servlet.annotation.WebServlet;
 
 @WebServlet(value = "/api/12", asyncSupported = true)
-public class SingleThreadedTest12Servlet extends AbstractAsyncTestServlet {
+public class SingleThreadedTest12Servlet extends AbstractTestServlet {
 
     protected static final int DEFAULT_ARRAY_SIZE = 1000;
     protected static final int DEFAULT_MIN_VALUE = 0;

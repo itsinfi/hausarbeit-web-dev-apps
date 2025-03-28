@@ -10,7 +10,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.ws.rs.core.Response;
 
-public abstract class AbstractAsyncTestController {
+public abstract class AbstractTestController {
     
     protected static final String THREAD_MODE = System.getenv("THREAD_MODE");
 
@@ -23,16 +23,16 @@ public abstract class AbstractAsyncTestController {
     protected static final ExecutorService threadPoolExecutor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
     protected static final ExecutorService virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor();
 
-    private JsonObject handleRoute(JsonObject req) {
+    protected JsonObject handleRoute(JsonObject req) {
         ThreadMonitor.countThreads();
         return test(req);
     }
     
-    private Response sendResponse(JsonObject jsonOutput) {
+    protected Response sendResponse(JsonObject jsonOutput) {
         return Response.ok(jsonOutput).build();
     }
 
-    private Response handleError(Throwable ex) {
+    protected Response handleError(Throwable ex) {
         ex.printStackTrace();
         return Response
                 .serverError()
@@ -42,18 +42,29 @@ public abstract class AbstractAsyncTestController {
                 .build();
     }
 
-    protected CompletableFuture<Response> handlePost(JsonObject req) {
-        ExecutorService executor = getExecutor(THREAD_MODE);
-
-        if (executor == null) {
-            return CompletableFuture.supplyAsync(() -> handleRoute(req))
-                    .thenApply(result -> sendResponse(result))
-                    .exceptionally(ex -> handleError(ex));
+    protected Response handlePost(JsonObject req) {
+        try {
+            JsonObject result = handleRoute(req);
+            return sendResponse(result);
+        } catch (Exception ex) {
+            return handleError(ex);
         }
+    }
 
-        return CompletableFuture.supplyAsync(() -> handleRoute(req))
-                    .thenApply(result -> sendResponse(result))
-                    .exceptionally(ex -> handleError(ex));
+    protected CompletableFuture<Response> handlePostAsync(JsonObject req) {
+        ExecutorService executor = getExecutor(THREAD_MODE);
+        return CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
+                .thenApply(result -> sendResponse(result))
+                .exceptionally(ex -> handleError(ex));
+    }
+    
+    protected Response handlePostSync(JsonObject req) {
+        try {
+            JsonObject result = handleRoute(req);
+            return sendResponse(result);
+        } catch (Exception ex) {
+            return handleError(ex);
+        }
     }
 
     protected ExecutorService getExecutor(String threadMode) {

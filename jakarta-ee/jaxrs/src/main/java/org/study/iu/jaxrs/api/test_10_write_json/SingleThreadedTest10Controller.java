@@ -3,7 +3,7 @@ package org.study.iu.jaxrs.api.test_10_write_json;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
-import org.study.iu.jaxrs.classes.AbstractAsyncTestController;
+import org.study.iu.jaxrs.classes.AbstractTestController;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -18,21 +18,26 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("10")
-public class SingleThreadedTest10Controller extends AbstractAsyncTestController {
+public class SingleThreadedTest10Controller extends AbstractTestController {
 
-    protected static final int DEFAULT_DEPTH = 3;
-    protected static final int DEFAULT_OBJECTS_PER_LEVEL = 4;
-    protected static final int DEFAULT_ARRAY_SIZE = 4;
-    protected static final int DEFAULT_MIN_VALUE = 0;
-    protected static final int DEFAULT_MAX_VALUE = 100;
+    private static final int DEFAULT_DEPTH = 3;
+    private static final int DEFAULT_OBJECTS_PER_LEVEL = 4;
+    private static final int DEFAULT_ARRAY_SIZE = 4;
+    private static final int DEFAULT_MIN_VALUE = 0;
+    private static final int DEFAULT_MAX_VALUE = 100;
     
-    protected static final Random RANDOM = new Random();
+    private static final Random RANDOM = new Random();
     
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public CompletableFuture<Response> post(JsonObject req) {
-        return handlePost(req);
+    public Response post(JsonObject req) {
+        try {
+            JsonObject result = handleRoute(req);
+            return sendResponse(result);
+        } catch (Exception ex) {
+            return handleError(ex);
+        }
     }
 
     private JsonObject generateJsonObject(int depth, int objectsPerLevel, int arraySize, int minValue, int maxValue) {

@@ -14,13 +14,32 @@ import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonNumber;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
+import jakarta.servlet.AsyncContext;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet(value = "/api/09_multi", asyncSupported = true)
 public class MultiThreadedTest09Servlet extends SingleThreadedTest09Servlet implements MultiThreadingTestable {
 
     private final static int DEFAULT_PARALLELIZATION_THRESHOLD = 3;
     private final static int DEFAULT_NESTING_PARALLELIZATION_LIMIT = 3;
+    
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) {
+        res.setContentType("application/json");
+        res.setCharacterEncoding("UTF-8");
+
+        AsyncContext asyncContext = req.startAsync();
+
+        ExecutorService executor = getExecutor(THREAD_MODE);
+
+        CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
+                .thenApply(result -> sendResponse(res, result, asyncContext))
+                .exceptionally(ex -> handleError(ex, asyncContext));
+
+        return;
+    }
 
     private void flattenJson(JsonValue json, List<Double> numbers, ExecutorService executor, int depth, int parallelizationThreshold, int nestingParallelizationLimit) {
         switch (json.getValueType()) {

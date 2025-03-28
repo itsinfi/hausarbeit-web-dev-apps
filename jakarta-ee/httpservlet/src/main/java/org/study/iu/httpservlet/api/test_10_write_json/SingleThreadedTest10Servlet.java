@@ -2,7 +2,7 @@ package org.study.iu.httpservlet.api.test_10_write_json;
 
 import java.util.Random;
 
-import org.study.iu.httpservlet.classes.AbstractAsyncTestServlet;
+import org.study.iu.httpservlet.classes.AbstractTestServlet;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -12,7 +12,7 @@ import jakarta.json.JsonObjectBuilder;
 import jakarta.servlet.annotation.WebServlet;
 
 @WebServlet(value = "/api/10", asyncSupported = true)
-public class SingleThreadedTest10Servlet extends AbstractAsyncTestServlet {
+public class SingleThreadedTest10Servlet extends AbstractTestServlet {
 
     protected static final int DEFAULT_DEPTH = 3;
     protected static final int DEFAULT_OBJECTS_PER_LEVEL = 4;

@@ -2,14 +2,14 @@ package org.study.iu.httpservlet.api.test_04_multiplication;
 
 import java.util.Random;
 
-import org.study.iu.httpservlet.classes.AbstractAsyncTestServlet;
+import org.study.iu.httpservlet.classes.AbstractTestServlet;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.servlet.annotation.WebServlet;
 
 @WebServlet(value = "/api/04", asyncSupported = true)
-public class SingleThreadedTest04Servlet extends AbstractAsyncTestServlet {
+public class SingleThreadedTest04Servlet extends AbstractTestServlet {
     
     protected static final int DEFAULT_ITERATIONS = 1000;
     protected static final int DEFAULT_LOWER_BOUND = 1;

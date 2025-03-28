@@ -8,7 +8,7 @@ import java.util.concurrent.CompletableFuture;
 import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
 import org.bouncycastle.crypto.params.Argon2Parameters;
 import org.bouncycastle.util.encoders.Hex;
-import org.study.iu.jaxrs.classes.AbstractAsyncTestController;
+import org.study.iu.jaxrs.classes.AbstractTestController;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -22,24 +22,29 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("14")
-public class SingleThreadedTest14Controller extends AbstractAsyncTestController {
+public class SingleThreadedTest14Controller extends AbstractTestController {
 
-    protected static final int DEFAULT_ARGON2_ITERATIONS = 3;
-    protected static final int DEFAULT_ARGON2_PARALLELISM = 4;
-    protected static final int DEFAULT_ARGON2_MEMORY_IN_KB = 65536;
-    protected static final int DEFAULT_SALT_SIZE = 128;
-    protected static final int DEFAULT_TASK_AMOUNT = 10;
+    private static final int DEFAULT_ARGON2_ITERATIONS = 3;
+    private static final int DEFAULT_ARGON2_PARALLELISM = 4;
+    private static final int DEFAULT_ARGON2_MEMORY_IN_KB = 65536;
+    private static final int DEFAULT_SALT_SIZE = 128;
+    private static final int DEFAULT_TASK_AMOUNT = 10;
 
-    protected static final SecureRandom RANDOM = new SecureRandom();
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public CompletableFuture<Response> post(JsonObject req) {
-        return handlePost(req);
+    public Response post(JsonObject req) {
+        try {
+            JsonObject result = handleRoute(req);
+            return sendResponse(result);
+        } catch (Exception ex) {
+            return handleError(ex);
+        }
     }
     
-    protected String hashPassword(String password, int iterations, int parallelism, int memoryInKb, int saltSize) {
+    private String hashPassword(String password, int iterations, int parallelism, int memoryInKb, int saltSize) {
         byte[] salt = new byte[saltSize / 8];
         RANDOM.nextBytes(salt);
 
@@ -65,7 +70,7 @@ public class SingleThreadedTest14Controller extends AbstractAsyncTestController 
         return saltHex + "$" + hashHex;
     }
     
-    protected boolean verifyPassword(String password, String storedHash, int iterations, int parallelism, int memoryInKb, int saltSize) {
+    private boolean verifyPassword(String password, String storedHash, int iterations, int parallelism, int memoryInKb, int saltSize) {
         String[] parts = storedHash.split("\\$");
         String storedSaltHex = parts[0];
         String storedHashHex = parts[1];

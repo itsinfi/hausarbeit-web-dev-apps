@@ -2,14 +2,14 @@ package org.study.iu.httpservlet.api.test_07_logarithms;
 
 import java.util.Random;
 
-import org.study.iu.httpservlet.classes.AbstractAsyncTestServlet;
+import org.study.iu.httpservlet.classes.AbstractTestServlet;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.servlet.annotation.WebServlet;
 
 @WebServlet(value = "/api/07", asyncSupported = true)
-public class SingleThreadedTest07Servlet extends AbstractAsyncTestServlet {
+public class SingleThreadedTest07Servlet extends AbstractTestServlet {
     
     protected static final int DEFAULT_ITERATIONS = 1000;
     

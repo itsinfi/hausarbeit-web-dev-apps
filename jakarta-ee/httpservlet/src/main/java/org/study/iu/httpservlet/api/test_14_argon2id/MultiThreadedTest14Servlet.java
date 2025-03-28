@@ -18,10 +18,29 @@ import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
+import jakarta.servlet.AsyncContext;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet(value = "/api/14_multi", asyncSupported = true)
 public class MultiThreadedTest14Servlet extends SingleThreadedTest14Servlet implements MultiThreadingTestable {
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) {
+        res.setContentType("application/json");
+        res.setCharacterEncoding("UTF-8");
+
+        AsyncContext asyncContext = req.startAsync();
+
+        ExecutorService executor = getExecutor(THREAD_MODE);
+
+        CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
+                .thenApply(result -> sendResponse(res, result, asyncContext))
+                .exceptionally(ex -> handleError(ex, asyncContext));
+
+        return;
+    }
 
     @Override
     protected String hashPassword(String password, int iterations, int parallelism, int memoryInKb, int saltSize) {

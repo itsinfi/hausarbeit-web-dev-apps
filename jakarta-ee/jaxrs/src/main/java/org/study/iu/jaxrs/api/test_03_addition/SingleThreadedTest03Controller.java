@@ -3,7 +3,7 @@ package org.study.iu.jaxrs.api.test_03_addition;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
-import org.study.iu.jaxrs.classes.AbstractAsyncTestController;
+import org.study.iu.jaxrs.classes.AbstractTestController;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -15,19 +15,24 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("03")
-public class SingleThreadedTest03Controller extends AbstractAsyncTestController {
+public class SingleThreadedTest03Controller extends AbstractTestController {
     
-    protected static final int DEFAULT_ITERATIONS = 1000;
-    protected static final int DEFAULT_LOWER_BOUND = 0;
-    protected static final int DEFAULT_UPPER_BOUND = 1;
+    private static final int DEFAULT_ITERATIONS = 1000;
+    private static final int DEFAULT_LOWER_BOUND = 0;
+    private static final int DEFAULT_UPPER_BOUND = 1;
     
-    protected static final Random RANDOM = new Random();
+    private static final Random RANDOM = new Random();
 
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public CompletableFuture<Response> post(JsonObject req) {
-        return handlePost(req);
+    public Response post(JsonObject req) {
+        try {
+            JsonObject result = handleRoute(req);
+            return sendResponse(result);
+        } catch (Exception ex) {
+            return handleError(ex);
+        }
     }
     
     @Override
