@@ -8,6 +8,7 @@ services:
     environment:
       - THREAD_MODE=${THREAD_MODE}
       - THREAD_POOL_SIZE=${THREAD_POOL_SIZE}
+      - CLUSTER_COUNT=${CLUSTER_COUNT}
     ports:
       - "3000:3000"
 
@@ -20,6 +21,7 @@ services:
     environment:
       - THREAD_MODE=${THREAD_MODE}
       - THREAD_POOL_SIZE=${THREAD_POOL_SIZE}
+      - CLUSTER_COUNT=${CLUSTER_COUNT}
     ports:
       - "3001:3000"
 
@@ -45,5 +47,6 @@ services:
     environment:
       - THREAD_MODE=${THREAD_MODE}
       - THREAD_POOL_SIZE=${THREAD_POOL_SIZE}
+      - CLUSTER_COUNT=${CLUSTER_COUNT}
     ports: 
       - "3003:9080"
