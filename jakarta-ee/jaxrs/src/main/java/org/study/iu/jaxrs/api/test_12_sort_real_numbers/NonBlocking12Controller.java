@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -24,6 +25,9 @@ import jakarta.ws.rs.core.Response;
 
 @Path("12_multi")
 public class NonBlocking12Controller extends AbstractTestController implements MultiThreadingTestable {
+    private static final ExecutorService OPERATIONAL_THREAD_POOL = Executors
+            .newFixedThreadPool(OPERATIONAL_THREAD_POOL_SIZE);
+
     private static final int DEFAULT_ARRAY_SIZE = 1000;
     private static final int DEFAULT_MIN_VALUE = 0;
     private static final int DEFAULT_MAX_VALUE = 1000;
@@ -32,18 +36,15 @@ public class NonBlocking12Controller extends AbstractTestController implements M
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public CompletableFuture<Response> post(JsonObject req) {
-final long startTime = System.nanoTime();
-        final ExecutorService executor = getExecutor(THREAD_MODE);
-        return CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
+        final long startTime = System.nanoTime();
+        return CompletableFuture.supplyAsync(() -> handleRoute(req), EVENT_LOOP_THREAD_POOL)
                 .thenApply(result -> sendResponse(result, startTime))
                 .exceptionally(ex -> handleError(ex, startTime));
     }
 
     @Override
     protected JsonObject test(JsonObject jsonInput) {
-        final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
         final int threads = jsonInput.getInt("threads", DEFAULT_THREADS);
-        final ExecutorService executor = getExecutor(taskThreadMode);
 
         final int arraySize = jsonInput.getInt("arraySize", DEFAULT_ARRAY_SIZE);
         final int minValue = jsonInput.getInt("minValue", DEFAULT_MIN_VALUE);
@@ -63,7 +64,7 @@ final long startTime = System.nanoTime();
                     }
 
                     return threadArray;
-                }, executor))
+                }, OPERATIONAL_THREAD_POOL))
                 .collect(Collectors.toList());
 
         final double[] array = CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new))
@@ -92,7 +93,6 @@ final long startTime = System.nanoTime();
         final JsonArray result = jsonArrayBuilder.build();
         
         return Json.createObjectBuilder()
-                .add("usedThreadMode", taskThreadMode)
                 .add("threads", threads)
                 .add("arraySize", arraySize)
                 .add("minValue", minValue)

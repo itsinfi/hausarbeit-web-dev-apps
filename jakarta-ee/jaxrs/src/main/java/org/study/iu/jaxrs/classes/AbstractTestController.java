@@ -3,24 +3,19 @@ package org.study.iu.jaxrs.classes;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import jakarta.annotation.Resource;
-import jakarta.enterprise.concurrent.ManagedExecutorService;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.ws.rs.core.Response;
 
 public abstract class AbstractTestController {
+    private static final int EVENT_LOOP_THREAD_POOL_SIZE = Integer.parseInt(System.getenv("EVENT_LOOP_THREAD_POOL_SIZE"));
+    protected static final int OPERATIONAL_THREAD_POOL_SIZE = 
+            Integer.parseInt(System.getenv("OPERATIONAL_THREAD_POOL_SIZE")) *
+            Integer.parseInt(System.getenv("CLUSTER_COUNT"));
     
-    protected static final String THREAD_MODE = System.getenv("THREAD_MODE");
-
-    protected static final int THREAD_POOL_SIZE = Integer.parseInt(System.getenv("THREAD_POOL_SIZE")) * 4 + 8;
+    protected static final ExecutorService EVENT_LOOP_THREAD_POOL = Executors.newFixedThreadPool(EVENT_LOOP_THREAD_POOL_SIZE);
     
     protected abstract JsonObject test(JsonObject jsonInput);
-    
-    @Resource
-    protected ManagedExecutorService managedExecutor;
-    protected static final ExecutorService threadPoolExecutor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
-    protected static final ExecutorService virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor();
 
     private String getProcessingTimeHeaderValue(long startTime) {
         final long endTime = System.nanoTime();
@@ -29,7 +24,7 @@ public abstract class AbstractTestController {
     }
 
     protected JsonObject handleRoute(JsonObject req) {
-        ThreadMonitor.countThreads();
+        // ThreadMonitor.countThreads();
         return test(req);
     }
     
@@ -47,26 +42,5 @@ public abstract class AbstractTestController {
         return Response.ok(jsonOutput)
                 .header("processing-time", getProcessingTimeHeaderValue(startTime))
                 .build();
-    }
-
-    protected ExecutorService getExecutor(String threadMode) {
-        switch (threadMode) {
-            case "V" -> {
-                System.out.println("----------V----------");
-                return virtualThreadExecutor;
-            }
-            case "M" -> {
-                System.out.println("----------M----------");
-                return managedExecutor;
-            }
-            case "TP" -> {
-                System.out.println("----------TP----------");
-                return threadPoolExecutor;
-            }
-            default -> {
-                System.out.println("----------NONE----------");
-                return null;
-            }
-        }
     }
 }

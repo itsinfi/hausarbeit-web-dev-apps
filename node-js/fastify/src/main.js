@@ -4,8 +4,10 @@ import startServer from './start-server.js';
 import config from './config/config.js';
 
 console.log('CLUSTER_COUNT:', process.env.CLUSTER_COUNT);
-console.log('THREAD_POOL_SIZE:', process.env.THREAD_POOL_SIZE);
-console.log('THREAD_MODE', process.env.THREAD_MODE);
+console.log('EVENT_LOOP_THREAD_POOL_SIZE:', process.env.EVENT_LOOP_THREAD_POOL_SIZE);
+console.log('OPERATIONAL_THREAD_POOL_SIZE:', process.env.OPERATIONAL_THREAD_POOL_SIZE);
+
+process.env.UV_THREADPOOL_SIZE = process.env.EVENT_LOOP_THREAD_POOL_SIZE;
 
 const clusterCount = process.env.CLUSTER_COUNT ?? 1;
 

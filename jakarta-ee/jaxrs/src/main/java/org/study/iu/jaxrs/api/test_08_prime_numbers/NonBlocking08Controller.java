@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.study.iu.jaxrs.classes.AbstractTestController;
 import org.study.iu.jaxrs.interfaces.MultiThreadingTestable;
@@ -23,24 +24,24 @@ import jakarta.ws.rs.core.Response;
 
 @Path("08_multi")
 public class NonBlocking08Controller extends AbstractTestController implements MultiThreadingTestable {
+    private static final ExecutorService OPERATIONAL_THREAD_POOL = Executors
+            .newFixedThreadPool(OPERATIONAL_THREAD_POOL_SIZE);
+
     private static final int DEFAULT_AMOUNT = 1000;
 
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public CompletableFuture<Response> post(JsonObject req) {
-final long startTime = System.nanoTime();
-        final ExecutorService executor = getExecutor(THREAD_MODE);
-        return CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
+        final long startTime = System.nanoTime();
+        return CompletableFuture.supplyAsync(() -> handleRoute(req), EVENT_LOOP_THREAD_POOL)
                 .thenApply(result -> sendResponse(result, startTime))
                 .exceptionally(ex -> handleError(ex, startTime));
     }
 
     @Override
     protected JsonObject test(JsonObject jsonInput) {
-        final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
         final int threads = jsonInput.getInt("threads", DEFAULT_THREADS);
-        final ExecutorService executor = getExecutor(taskThreadMode);
 
         final int amount = jsonInput.getInt("amount", DEFAULT_AMOUNT);
 
@@ -84,7 +85,7 @@ final long startTime = System.nanoTime();
                                     }
                                 }
                             }
-                    }, executor)
+                    }, OPERATIONAL_THREAD_POOL)
                 );
             }
 
@@ -108,7 +109,6 @@ final long startTime = System.nanoTime();
         JsonArray result = jsonArrayBuilder.build();
 
         return Json.createObjectBuilder()
-                .add("usedThreadMode", taskThreadMode)
                 .add("threads", threads)
                 .add("iterations", iterations)
                 .add("found", result.size())

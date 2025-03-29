@@ -15,7 +15,6 @@
     "dotenv": "16.4.7",
     "fastify": "5.2.1",
     "fastify-js": "file:",
-    "mongodb": "6.14.2",
     "piscina": "4.9.2"
   }
 }

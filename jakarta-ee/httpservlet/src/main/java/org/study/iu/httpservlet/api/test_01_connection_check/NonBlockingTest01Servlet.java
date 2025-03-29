@@ -21,9 +21,7 @@ public class NonBlockingTest01Servlet extends BlockingTest01Servlet implements M
 
         final AsyncContext asyncContext = req.startAsync();
 
-        final ExecutorService executor = getExecutor(THREAD_MODE);
-
-        CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
+        CompletableFuture.supplyAsync(() -> handleRoute(req), EVENT_LOOP_THREAD_POOL)
                 .thenApply(result -> sendResponse(res, result, asyncContext, startTime))
                 .exceptionally(ex -> handleError(ex, asyncContext, startTime));
 

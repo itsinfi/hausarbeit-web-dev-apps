@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -29,6 +30,8 @@ import jakarta.ws.rs.core.Response;
 
 @Path("14_multi")
 public class NonBlocking14Controller extends AbstractTestController implements MultiThreadingTestable {
+    private static final ExecutorService OPERATIONAL_THREAD_POOL = Executors
+            .newFixedThreadPool(OPERATIONAL_THREAD_POOL_SIZE);
 
     private static final int DEFAULT_ARGON2_ITERATIONS = 3;
     private static final int DEFAULT_ARGON2_PARALLELISM = 4;
@@ -40,9 +43,8 @@ public class NonBlocking14Controller extends AbstractTestController implements M
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public CompletableFuture<Response> post(JsonObject req) {
-final long startTime = System.nanoTime();
-        final ExecutorService executor = getExecutor(THREAD_MODE);
-        return CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
+        final long startTime = System.nanoTime();
+        return CompletableFuture.supplyAsync(() -> handleRoute(req), EVENT_LOOP_THREAD_POOL)
                 .thenApply(result -> sendResponse(result, startTime))
                 .exceptionally(ex -> handleError(ex, startTime));
     }
@@ -101,9 +103,6 @@ final long startTime = System.nanoTime();
     
     @Override
     protected JsonObject test(JsonObject jsonInput) {
-        final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
-        final ExecutorService executor = getExecutor(taskThreadMode);
-
         final String password = jsonInput.getString("password");
         final int iterations = jsonInput.getInt("iterations", DEFAULT_ARGON2_ITERATIONS);
         final int parallelism = jsonInput.getInt("parallelism", DEFAULT_ARGON2_PARALLELISM);
@@ -126,7 +125,7 @@ final long startTime = System.nanoTime();
         final List<CompletableFuture<JsonObject>> futures = IntStream
                 .range(0, taskAmount)
                 .mapToObj(a -> CompletableFuture
-                .supplyAsync(task, executor))
+                .supplyAsync(task, OPERATIONAL_THREAD_POOL))
                 .collect(Collectors.toList());
 
         CompletableFuture<Void> allDone = CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
@@ -140,7 +139,6 @@ final long startTime = System.nanoTime();
         JsonArray result = jsonArrayBuilder.build();
         
         return Json.createObjectBuilder()
-                .add("usedThreadMode", taskThreadMode)
                 .add("password", password)
                 .add("iterations", iterations)
                 .add("parallelism", parallelism)

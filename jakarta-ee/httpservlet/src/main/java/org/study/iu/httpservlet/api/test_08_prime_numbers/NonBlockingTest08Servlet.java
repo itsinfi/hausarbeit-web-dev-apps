@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.study.iu.httpservlet.interfaces.MultiThreadingTestable;
 
@@ -21,6 +22,9 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet(value = "/api/08_multi", asyncSupported = true)
 public class NonBlockingTest08Servlet extends BlockingTest08Servlet implements MultiThreadingTestable {
 
+    private static final ExecutorService OPERATIONAL_THREAD_POOL = Executors
+            .newFixedThreadPool(OPERATIONAL_THREAD_POOL_SIZE);
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) {
         final long startTime = System.nanoTime();
@@ -30,9 +34,7 @@ public class NonBlockingTest08Servlet extends BlockingTest08Servlet implements M
 
         final AsyncContext asyncContext = req.startAsync();
 
-        final ExecutorService executor = getExecutor(THREAD_MODE);
-
-        CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
+        CompletableFuture.supplyAsync(() -> handleRoute(req), EVENT_LOOP_THREAD_POOL)
                 .thenApply(result -> sendResponse(res, result, asyncContext, startTime))
                 .exceptionally(ex -> handleError(ex, asyncContext, startTime));
 
@@ -41,12 +43,7 @@ public class NonBlockingTest08Servlet extends BlockingTest08Servlet implements M
 
     @Override
     protected JsonObject test(JsonObject jsonInput) {
-        final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
         final int threads = jsonInput.getInt("threads", DEFAULT_THREADS);
-        final ExecutorService executor = getExecutor(taskThreadMode);
-        if (executor == null || threads <= 1) {
-            return super.test(jsonInput);
-        }
 
         final int amount = jsonInput.getInt("amount", DEFAULT_AMOUNT);
 
@@ -90,7 +87,7 @@ public class NonBlockingTest08Servlet extends BlockingTest08Servlet implements M
                                     }
                                 }
                             }
-                    }, executor)
+                    }, OPERATIONAL_THREAD_POOL)
                 );
             }
 
@@ -114,7 +111,6 @@ public class NonBlockingTest08Servlet extends BlockingTest08Servlet implements M
         JsonArray result = jsonArrayBuilder.build();
 
         return Json.createObjectBuilder()
-                .add("usedThreadMode", taskThreadMode)
                 .add("threads", threads)
                 .add("iterations", iterations)
                 .add("found", result.size())

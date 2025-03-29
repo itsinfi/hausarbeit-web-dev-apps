@@ -3,6 +3,7 @@ package org.study.iu.jaxrs.api.test_02_static_content;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -23,6 +24,9 @@ import jakarta.ws.rs.core.Response;
 @Path("02_multi")
 public class NonBlocking02Controller extends AbstractTestController implements MultiThreadingTestable {
 
+    private static final ExecutorService OPERATIONAL_THREAD_POOL = Executors
+            .newFixedThreadPool(OPERATIONAL_THREAD_POOL_SIZE);
+
     private static final int DEFAULT_LENGTH = 1000;
     
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -31,18 +35,15 @@ public class NonBlocking02Controller extends AbstractTestController implements M
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public CompletableFuture<Response> post(JsonObject req) {
-final long startTime = System.nanoTime();
-        final ExecutorService executor = getExecutor(THREAD_MODE);
-        return CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
+        final long startTime = System.nanoTime();
+        return CompletableFuture.supplyAsync(() -> handleRoute(req), EVENT_LOOP_THREAD_POOL)
                 .thenApply(result -> sendResponse(result, startTime))
                 .exceptionally(ex -> handleError(ex, startTime));
     }
 
     @Override
     protected JsonObject test(JsonObject jsonInput) {
-        final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
         final int threads = jsonInput.getInt("threads", DEFAULT_THREADS);
-        final ExecutorService executor = getExecutor(taskThreadMode);
     
         final int length = jsonInput.getInt("length", DEFAULT_LENGTH);
 
@@ -67,7 +68,7 @@ final long startTime = System.nanoTime();
                 .mapToObj(a -> CompletableFuture
                         .supplyAsync(() -> {
                             return task.apply(a);
-                        }, executor))
+                        }, OPERATIONAL_THREAD_POOL))
                 .collect(Collectors.toList());
 
         final String result = futures.parallelStream()
@@ -76,7 +77,6 @@ final long startTime = System.nanoTime();
 
         return Json
                 .createObjectBuilder()
-                .add("usedThreadMode", taskThreadMode)
                 .add("threads", threads)
                 .add("length", length)
                 .add("result", result)

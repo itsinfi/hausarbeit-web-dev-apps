@@ -14,7 +14,7 @@ const threadPool = createThreadPool('./src/workers/02.js');
 })();
 
 export default async (request) => {
-    const threads = Number(request.body.threads ?? process.env.THREAD_POOL_SIZE ?? 1);
+    const threads = Number(request.body.threads ?? 1);
     const length = Number(request.body.length ?? DEFAULT_LENGTH);
 
     if (threads <= 1) {

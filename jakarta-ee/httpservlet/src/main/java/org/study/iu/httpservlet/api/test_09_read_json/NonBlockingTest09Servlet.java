@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.study.iu.httpservlet.interfaces.MultiThreadingTestable;
 
@@ -24,6 +25,9 @@ public class NonBlockingTest09Servlet extends BlockingTest09Servlet implements M
 
     private final static int DEFAULT_PARALLELIZATION_THRESHOLD = 3;
     private final static int DEFAULT_NESTING_PARALLELIZATION_LIMIT = 3;
+
+    private static final ExecutorService OPERATIONAL_THREAD_POOL = Executors
+            .newFixedThreadPool(OPERATIONAL_THREAD_POOL_SIZE);
     
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) {
@@ -34,9 +38,7 @@ public class NonBlockingTest09Servlet extends BlockingTest09Servlet implements M
 
         final AsyncContext asyncContext = req.startAsync();
 
-        final ExecutorService executor = getExecutor(THREAD_MODE);
-
-        CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
+        CompletableFuture.supplyAsync(() -> handleRoute(req), EVENT_LOOP_THREAD_POOL)
                 .thenApply(result -> sendResponse(res, result, asyncContext, startTime))
                 .exceptionally(ex -> handleError(ex, asyncContext, startTime));
 
@@ -97,15 +99,10 @@ public class NonBlockingTest09Servlet extends BlockingTest09Servlet implements M
                 DEFAULT_PARALLELIZATION_THRESHOLD);
         final int nestingParallelizationLimit = jsonInput.getInt("nestingParallelizationLimit",
                 DEFAULT_NESTING_PARALLELIZATION_LIMIT);
-        final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
-        final ExecutorService executor = getExecutor(taskThreadMode);
-        if (executor == null) {
-            return super.test(jsonInput);
-        }
 
         final List<Double> numbers = Collections.synchronizedList(new ArrayList<>());
 
-        flattenJson(jsonInput, numbers, executor, 0, parallelizationThreshold, nestingParallelizationLimit);
+        flattenJson(jsonInput, numbers, OPERATIONAL_THREAD_POOL, 0, parallelizationThreshold, nestingParallelizationLimit);
 
         final JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
 
@@ -116,7 +113,6 @@ public class NonBlockingTest09Servlet extends BlockingTest09Servlet implements M
         final JsonArray result = jsonArrayBuilder.build();
 
         return Json.createObjectBuilder()
-                .add("usedThreadMode", taskThreadMode)
                 .add("parallelizationThreshold", parallelizationThreshold)
                 .add("nestingParallelizationLimit", nestingParallelizationLimit)
                 .add("found", result.size())

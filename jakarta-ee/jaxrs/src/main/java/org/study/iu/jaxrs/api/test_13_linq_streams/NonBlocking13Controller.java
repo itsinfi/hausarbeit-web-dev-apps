@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.study.iu.jaxrs.classes.AbstractTestController;
 import org.study.iu.jaxrs.interfaces.MultiThreadingTestable;
@@ -25,6 +26,8 @@ import jakarta.ws.rs.core.Response;
 
 @Path("13_multi")
 public class NonBlocking13Controller extends AbstractTestController implements MultiThreadingTestable {
+    private static final ExecutorService OPERATIONAL_THREAD_POOL = Executors
+            .newFixedThreadPool(OPERATIONAL_THREAD_POOL_SIZE);
 
     private final static int DEFAULT_PARALLELIZATION_THRESHOLD = 3;
     private final static int DEFAULT_NESTING_PARALLELIZATION_LIMIT = 3;
@@ -33,9 +36,8 @@ public class NonBlocking13Controller extends AbstractTestController implements M
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public CompletableFuture<Response> post(JsonObject req) {
-final long startTime = System.nanoTime();
-        final ExecutorService executor = getExecutor(THREAD_MODE);
-        return CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
+        final long startTime = System.nanoTime();
+        return CompletableFuture.supplyAsync(() -> handleRoute(req), EVENT_LOOP_THREAD_POOL)
                 .thenApply(result -> sendResponse(result, startTime))
                 .exceptionally(ex -> handleError(ex, startTime));
     }
@@ -84,12 +86,10 @@ final long startTime = System.nanoTime();
                 DEFAULT_PARALLELIZATION_THRESHOLD);
         final int nestingParallelizationLimit = jsonInput.getInt("nestingParallelizationLimit",
                 DEFAULT_NESTING_PARALLELIZATION_LIMIT);
-        final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
-        final ExecutorService executor = getExecutor(taskThreadMode);
 
         final List<Double> numbers = Collections.synchronizedList(new ArrayList<>());
 
-        flattenJson(jsonInput, numbers, executor, 0, parallelizationThreshold, nestingParallelizationLimit);
+        flattenJson(jsonInput, numbers, OPERATIONAL_THREAD_POOL, 0, parallelizationThreshold, nestingParallelizationLimit);
 
         Collections.sort(numbers, Comparator.naturalOrder());
         
@@ -102,7 +102,6 @@ final long startTime = System.nanoTime();
         final JsonArray result = jsonArrayBuilder.build();
 
         return Json.createObjectBuilder()
-                .add("usedThreadMode", taskThreadMode)
                 .add("parallelizationThreshold", parallelizationThreshold)
                 .add("nestingParallelizationLimit", nestingParallelizationLimit)
                 .add("found", result.size())

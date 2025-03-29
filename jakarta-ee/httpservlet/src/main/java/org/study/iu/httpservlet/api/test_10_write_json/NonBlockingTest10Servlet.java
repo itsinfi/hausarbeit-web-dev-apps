@@ -3,6 +3,7 @@ package org.study.iu.httpservlet.api.test_10_write_json;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -22,6 +23,9 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet(value = "/api/10_multi", asyncSupported = true)
 public class NonBlockingTest10Servlet extends BlockingTest10Servlet implements MultiThreadingTestable {
 
+    private static final ExecutorService OPERATIONAL_THREAD_POOL = Executors
+            .newFixedThreadPool(OPERATIONAL_THREAD_POOL_SIZE);
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) {
         final long startTime = System.nanoTime();
@@ -31,9 +35,7 @@ public class NonBlockingTest10Servlet extends BlockingTest10Servlet implements M
 
         final AsyncContext asyncContext = req.startAsync();
 
-        final ExecutorService executor = getExecutor(THREAD_MODE);
-
-        CompletableFuture.supplyAsync(() -> handleRoute(req), executor)
+        CompletableFuture.supplyAsync(() -> handleRoute(req), EVENT_LOOP_THREAD_POOL)
                 .thenApply(result -> sendResponse(res, result, asyncContext, startTime))
                 .exceptionally(ex -> handleError(ex, asyncContext, startTime));
 
@@ -72,22 +74,15 @@ public class NonBlockingTest10Servlet extends BlockingTest10Servlet implements M
     
     @Override
     protected JsonObject test(JsonObject jsonInput) {
-        final String taskThreadMode = jsonInput.getString("taskThreadMode", DEFAULT_TASK_THREAD_MODE);
-        final ExecutorService executor = getExecutor(taskThreadMode);
-        if (executor == null) {
-            return super.test(jsonInput);
-        }
-
         final int depth = jsonInput.getInt("depth", DEFAULT_DEPTH);
         final int objectsPerLevel = jsonInput.getInt("objectsPerLevel", DEFAULT_OBJECTS_PER_LEVEL);
         final int arraySize = jsonInput.getInt("arraySize", DEFAULT_ARRAY_SIZE);
         final int minValue = jsonInput.getInt("minValue", DEFAULT_MIN_VALUE);
         final int maxValue = jsonInput.getInt("maxValue", DEFAULT_MAX_VALUE);
 
-        final JsonObject result = this.generateJsonObject(executor, depth, objectsPerLevel, arraySize, minValue, maxValue).join();
+        final JsonObject result = this.generateJsonObject(OPERATIONAL_THREAD_POOL, depth, objectsPerLevel, arraySize, minValue, maxValue).join();
         
         return Json.createObjectBuilder()
-                .add("usedThreadMode",taskThreadMode)
                 .add("depth", depth)
                 .add("objectsPerLevel", objectsPerLevel)
                 .add("arraySize", arraySize)

@@ -7,8 +7,6 @@ import java.io.PrintWriter;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import jakarta.annotation.Resource;
-import jakarta.enterprise.concurrent.ManagedExecutorService;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
@@ -19,15 +17,14 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public abstract class AbstractTestServlet extends HttpServlet {
 
-    protected static final String THREAD_MODE = System.getenv("THREAD_MODE");
-    protected static final int THREAD_POOL_SIZE = Integer.parseInt(System.getenv("THREAD_POOL_SIZE")) * 4 + 8;
+    private static final int EVENT_LOOP_THREAD_POOL_SIZE = Integer.parseInt(System.getenv("EVENT_LOOP_THREAD_POOL_SIZE"));
+    protected static final int OPERATIONAL_THREAD_POOL_SIZE = 
+            Integer.parseInt(System.getenv("OPERATIONAL_THREAD_POOL_SIZE")) *
+            Integer.parseInt(System.getenv("CLUSTER_COUNT"));
+    
+    protected static final ExecutorService EVENT_LOOP_THREAD_POOL = Executors.newFixedThreadPool(EVENT_LOOP_THREAD_POOL_SIZE);
     
     protected abstract JsonObject test(JsonObject jsonInput);
-    
-    @Resource
-    protected ManagedExecutorService managedExecutor;
-    protected static final ExecutorService threadPoolExecutor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
-    protected static final ExecutorService virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor();
 
     private void addProcessingTimeHeader(long startTime, HttpServletResponse res) {
         final long endTime = System.nanoTime();
@@ -51,9 +48,9 @@ public abstract class AbstractTestServlet extends HttpServlet {
     
     protected Void sendResponse(HttpServletResponse res, JsonObject jsonOutput, final AsyncContext asyncContext, long startTime) {
         // ThreadMonitor.countThreads();
+        addProcessingTimeHeader(startTime, res);
         try (final PrintWriter out = res.getWriter()) {
             out.print(jsonOutput.toString());
-            addProcessingTimeHeader(startTime, res);
             out.flush();
         } catch (Exception e) {
             addProcessingTimeHeader(startTime, res);
@@ -76,6 +73,7 @@ public abstract class AbstractTestServlet extends HttpServlet {
                 .build();
         
         res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        addProcessingTimeHeader(startTime, res);
         
         try (final PrintWriter out = res.getWriter()) {
             out.print(jsonError.toString());
@@ -87,7 +85,6 @@ public abstract class AbstractTestServlet extends HttpServlet {
                 asyncContext.complete();
             }
 
-            addProcessingTimeHeader(startTime, res);
         }
         return null;
     }
@@ -104,27 +101,6 @@ public abstract class AbstractTestServlet extends HttpServlet {
             sendResponse(res, result, null, startTime);
         } catch (Exception ex) {
             handleError(ex, null, startTime);
-        }
-    }
-    
-    protected ExecutorService getExecutor(String threadMode) {
-        switch (threadMode) {
-            case "V" -> {
-                System.out.println("----------V----------");
-                return virtualThreadExecutor;
-            }
-            case "M" -> {
-                System.out.println("----------M----------");
-                return managedExecutor;
-            }
-            case "TP" -> {
-                System.out.println("----------TP----------");
-                return threadPoolExecutor;
-            }
-            default -> {
-                System.out.println("----------NONE----------");
-                return null;
-            }
         }
     }
 }
