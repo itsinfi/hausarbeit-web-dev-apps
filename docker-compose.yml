@@ -6,7 +6,8 @@ services:
     env_file:
       - .env
     environment:
-      - THREAD_POOL_SIZE=${THREAD_POOL_SIZE}
+      - EVENT_LOOP_THREAD_POOL_SIZE=${EVENT_LOOP_THREAD_POOL_SIZE}
+      - OPERATIONAL_THREAD_POOL_SIZE=${OPERATIONAL_THREAD_POOL_SIZE}
       - CLUSTER_COUNT=${CLUSTER_COUNT}
     ports:
       - "3000:3000"
@@ -18,7 +19,8 @@ services:
     env_file:
       - .env
     environment:
-      - THREAD_POOL_SIZE=${THREAD_POOL_SIZE}
+      - EVENT_LOOP_THREAD_POOL_SIZE=${EVENT_LOOP_THREAD_POOL_SIZE}
+      - OPERATIONAL_THREAD_POOL_SIZE=${OPERATIONAL_THREAD_POOL_SIZE}
       - CLUSTER_COUNT=${CLUSTER_COUNT}
     ports:
       - "3001:3000"
@@ -30,7 +32,8 @@ services:
     env_file:
       - .env
     environment:
-      - THREAD_POOL_SIZE=${THREAD_POOL_SIZE}
+      - EVENT_LOOP_THREAD_POOL_SIZE=${EVENT_LOOP_THREAD_POOL_SIZE}
+      - OPERATIONAL_THREAD_POOL_SIZE=${OPERATIONAL_THREAD_POOL_SIZE}
       - CLUSTER_COUNT=${CLUSTER_COUNT}
     ports: 
       - "3002:9080"
