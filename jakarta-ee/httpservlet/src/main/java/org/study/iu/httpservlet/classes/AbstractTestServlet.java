@@ -20,7 +20,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public abstract class AbstractTestServlet extends HttpServlet {
 
     protected static final String THREAD_MODE = System.getenv("THREAD_MODE");
-    protected static final int THREAD_POOL_SIZE = Integer.parseInt(System.getenv("THREAD_POOL_SIZE"));
+    protected static final int THREAD_POOL_SIZE = Integer.parseInt(System.getenv("THREAD_POOL_SIZE")) * 4 + 8;
     
     protected abstract JsonObject test(JsonObject jsonInput);
     
